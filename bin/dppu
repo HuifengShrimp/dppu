@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# default: use remote docker image
+DOCKER_IMAGE=registry.hub.docker.com/secretflow/ppu-gcc11-anolis-dev:latest
+
+# use docker image built from ppu/docker/*.dockerfile
+# TODO: automatic image build from dockerfile
+# DOCKER_IMAGE=ppu-dev 
+
+CMD_PREFIX="[dppu]"
+DPPU_PATH=`which dppu | sed 's/bin\/dppu//'`
+PPU_PATH="$DPPU_PATH/ppu"
+
+HELP()
+{
+    echo ""
+    echo "Usage: ppu COMMAND"
+    echo ""
+    echo "  An easy-to-use tool for developing ppu in docker"
+    echo ""
+    echo "Avaliable Commands:"
+    echo "  in          Enter ppu container"
+    echo "  build       Build ppu container"
+    echo "  rebuild     Remove current, and build new ppu container"
+    echo "  stop        Stop ppu container"
+    echo "  start       Start ppu container"
+    echo "  clean       Clean ppu container"
+    echo "  help        Show this message"
+    echo ""
+}
+
+case $1 in
+    "in")
+        echo $CMD_PREFIX "Entering: ppu-gcc11-dev-$(whoami) ..."
+        docker exec -it ppu-gcc11-dev-$(whoami) bash
+        echo $CMD_PREFIX "bye bye!"
+        ;;
+    "build")
+        echo $CMD_PREFIX "building: ppu-gcc11-dev-$(whoami) ..."
+        docker run -d -it --name ppu-gcc11-dev-$(whoami) \
+         --mount type=bind,source="$PPU_PATH",target=/home/admin/dev/ \
+         --mount type=bind,source="$DPPU_PATH/docker",target=/home/root/ \
+         -w /home/admin/dev \
+         --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+         --cap-add=NET_ADMIN \
+         $DOCKER_IMAGE &&
+         echo $CMD_PREFIX "build success"
+        ;;
+    "rebuild")
+        dppu clean
+        dppu build
+        ;;
+    "stop")
+        echo $CMD_PREFIX "Stopping: ppu-gcc11-dev-$(whoami) ..."
+        docker stop ppu-gcc11-dev-$(whoami) > /dev/null 2>&1 &&
+        echo $CMD_PREFIX "Stop succeed"
+        ;;
+    "start")
+        echo $CMD_PREFIX "Starting: ppu-gcc11-dev-$(whoami) ..."
+        docker start ppu-gcc11-dev-$(whoami) > /dev/null 2>&1 &&
+        echo $CMD_PREFIX "Start succeed"
+        ;;
+    "clean")
+        echo $CMD_PREFIX "Cleaning: ppu-gcc11-dev-$(whoami) ..."
+        docker stop ppu-gcc11-dev-$(whoami) > /dev/null 2>&1 &&
+        docker rm ppu-gcc11-dev-$(whoami) > /dev/null 2>&1 &&
+        echo $CMD_PREFIX "Clean succeed"
+        ;;
+    "" | "help")
+        HELP
+        ;;
+    *)
+        echo $CMD_PREFIX "Command unknown: " $1
+        ;;
+esac

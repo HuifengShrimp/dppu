@@ -1,0 +1,250 @@
+//
+// Copyright 2021 Ant Group Co., Ltd.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+// This file defines data structures that used to access and control PPU.
+// - IO access (data infeed & outfeed).
+// - Runtime control (jit, runtime config and setup)
+//
+// It does NOT define how to program toward PPU, programming part is defined by
+// [pphlo](ppu/dialect/pphlo.td)
+
+syntax = "proto3";
+
+package ppu;
+
+// The PPU datatype
+//
+// Unlike normal clear-text machine, which support (u8/u32/i64/f32/...) like
+// data types, the underline evaluation engine of ppu is based on some algebraic
+// structures (like ring or field), and PPU encode numbers (FXP or INT) on it,
+// so PPU has its only datatype.
+//
+// Currently we only support two datatype, but we suppose to support variadic
+// length datatype in the future.
+enum DataType {
+  DT_INVALID = 0;
+  DT_INT = 1;  // integer
+  DT_FXP = 2;  // fixed point
+}
+
+// The visibility type.
+//
+// PPU is secure evaluation runtime, but not all information are secret, some of
+// the information is public known to all parties, so mark these info as public
+// will improve performance significantly. So nearly all MPC papers distinguish
+// operations between (secret to secret) from (secret to public).
+//
+// This enum let users to mark the visibility of variables.
+enum Visibility {
+  VIS_INVALID = 0;
+  VIS_SECRET = 1;  // unknown for all or some of the parties.
+  VIS_PUBLIC = 2;  // public for all parties.
+}
+
+// The shape information.
+message ShapeProto {
+  repeated int64 dims = 1;
+}
+
+// Plain-text type
+//
+// PPU runtime does not deal with plaintext type directly, plaintext type
+// is mainly used for IO purpose.
+//
+// When convert a plaintext buffer to a PPU buffer, we have to let ppu know
+// which type the plaintext buffer is.
+enum PtType {
+  PT_INVALID = 0;  //
+  PT_I8 = 1;       // int8_t
+  PT_U8 = 2;       // uint8_t
+  PT_I16 = 3;      // int16_t
+  PT_U16 = 4;      // uint16_t
+  PT_I32 = 5;      // int32_t
+  PT_U32 = 6;      // uint32_t
+  PT_I64 = 7;      // int64_t
+  PT_U64 = 8;      // uint64_t
+  PT_F32 = 9;      // float
+  PT_F64 = 10;     // double
+  PT_I128 = 11;    // int128_t
+  PT_U128 = 12;    // uint128_t
+  PT_BOOL = 13;    // bool
+}
+
+// A security relate type.
+//
+// The secure evaluation is based on some algebraic structure (ring or field),
+// this enum describes the property of it.
+enum FieldType {
+  FT_INVALID = 0;
+  FM32 = 1;   // Ring 2^32
+  FM64 = 2;   // Ring 2^64
+  FM128 = 3;  // Ring 2^128
+}
+
+// The protocol kind.
+enum ProtocolKind {
+  PROT_INVALID = 0;
+  REF2K = 1;
+  SEMI2K = 2;
+  ABY3 = 3;
+  CHEETAH = 4;
+}
+
+// The ppu Value proto, used for ppu value serialization.
+message ValueProto {
+  // The type string of the element type.
+  string type_data = 1;
+  // The shape of the value.
+  ShapeProto shape = 2;
+  // The runtime/protocol dependent value data.
+  bytes content = 3;
+}
+
+enum SigmoidMode {
+  // Implementation defined.
+  DEFAULT = 0;
+  // Minmax approximation one order.
+  // f(x) = 0.5 + 0.125 * x
+  MM1 = 1;
+  // PieceWise simulation.
+  // f(x) = 0.5 + 0.125x if -4 <= x <= 4
+  //        1            if       x > 4
+  //        0            if  -4 > x
+  SEG3 = 2;
+  // The real definition, which depends on exp's accuracy.
+  // f(x) = 1 / (1 + exp(-x))
+  REAL = 3;
+}
+
+message RuntimeConfig {
+  ///////////////////////////////////////
+  // basic
+  ///////////////////////////////////////
+  ProtocolKind protocol = 1;
+
+  FieldType field = 2;
+
+  // fixed-point encoding config.
+  int64 fxp_fraction_bits = 3;
+
+  ///////////////////////////////////////
+  // advanced
+  ///////////////////////////////////////
+
+  /// runtime related.
+
+  // when enabled, runtime prints verbose info of the callstack, debug purpose
+  // only.
+  bool enable_action_trace = 10;
+
+  // when enabled, runtime check type info with compiler deduced type, if not
+  // match, a exception raises. Note: no matter the checker is on or off, the
+  // real output type use the runtime type decuction as a standard.
+  bool enable_type_checker = 11;
+
+  // when enabled, runtime prints executed pphlo list, debug purpose only.
+  bool enable_pphlo_trace = 12;
+
+  // when enabled, runtime dumps executed excutables in the dump_dir, debug
+  // purpose only.
+  bool enable_processor_dump = 13;
+  string processor_dump_dir = 14;
+
+  // when enabled, runtime prints detailed timeing data, debug purpose only.
+  bool enable_op_time_profile = 15;
+
+  /// fixed-point arithmetic related.
+
+  // the iterations use in goldschmdit reciprocal method.
+  int64 fxp_reciprocal_goldschmdit_iters = 21;
+
+  // TODO: should we add the approximation method as prefix, for example
+  // 'fxp_newton', leave space for other approximation method?
+  int64 fxp_exp_iters = 22;
+  int64 fxp_log_iters = 23;
+  int64 fxp_log_orders = 24;
+
+  // FIXME: the concept of trunc_pr is wrong, trunc_pr means the LSB of result
+  // is undefined, not mean the probabilistic large local trunction error
+  // introduced by SecureML method.
+  bool disable_trunc_pr = 25;
+
+  // the sigmoid approximation method.
+  SigmoidMode sigmoid_mode = 26;
+
+  // The public random variable generated by the runtime, the concrete prg
+  // function is implementation defined.
+  // Note: this seed only applies for `public variable`, there is nothing to do
+  // with security.
+  uint64 public_random_seed = 40;
+
+  // Allow runtime to reveal `secret variable` use as if and while
+  // condition result.
+  bool reveal_secret_condition = 41;
+}
+
+enum IrType {
+  IR_INVALID = 0;
+
+  // IR_XLA_HLO means the code part of IrProto is XLA protobuf binary format.
+  // See https://www.tensorflow.org/xla/architecture for details.
+  IR_XLA_HLO = 1;
+
+  // IR_MLIR_PPU means the code part of IrProto is pphlo MLIR text format.
+  // See ppu/dialect/pphlo_dialect.td for details.
+  IR_MLIR_PPU = 2;
+}
+
+message XlaMeta {
+  repeated Visibility inputs = 1;
+}
+
+message IrProto {
+  IrType ir_type = 1;
+
+  // Code format is defined by IrType.
+  bytes code = 2;
+
+  // Only meanful for IR_XLA_HLO
+  XlaMeta meta = 3;
+}
+
+message ExecutableProto {
+  // The name of the executable.
+  string name = 1;
+
+  // IO is independent with the executable.
+  // - the input should be prepared before running executable.
+  // - the output is saved, and can be fetched by output name.
+  //
+  // i.e.
+  // Note: this is pseudo-code, real ppu runtime is a distributed-runtime.
+  //
+  //   rt = ppu.Runtime(...)            # create a ppu runtime.
+  //   rt.set_var('x', ...)             # set variable to the runtime.
+  //   exe = ppu.ExecutableProto(       # prepare the executable.
+  //           name = 'balabala',
+  //           input_names = ['x'],
+  //           output_names = ['y'],
+  //           code = ...)
+  //   rt.run(exe)                      # run the exetubable.
+  //   y = rt.get_var('y')              # get the executable from ppu runtime.
+  repeated string input_names = 2;
+  repeated string output_names = 4;
+
+  // The bytecode of the program, with format IR_MLIR_PPU.
+  bytes code = 6;
+}

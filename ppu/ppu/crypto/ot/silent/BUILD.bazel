@@ -1,0 +1,108 @@
+
+# Copyright 2021 Ant Group Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+load("//bazel:ppu.bzl", "ppu_cc_binary", "ppu_cc_library", "ppu_cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+ppu_cc_library(
+    name = "primitives",
+    hdrs = ["primitives.h"],
+    deps = [
+        ":nonlinear_protocols",
+        ":silent_ot",
+    ],
+)
+
+ppu_cc_library(
+    name = "cheetah_io",
+    srcs = ["cheetah_io_channel.cc"],
+    hdrs = [
+        "cheetah_io_channel.h",
+        "utils.h",
+    ],
+    deps = [
+        "//ppu/link",
+        "@com_github_emptoolkit_emp_tool//:emp-tool",
+    ],
+)
+
+ppu_cc_test(
+    name = "cheetah_io_test",
+    srcs = ["cheetah_io_test.cc"],
+    copts = [
+        "-march=native",
+        "-maes",
+        "-mrdseed",
+    ],
+    deps = [
+        "cheetah_io",
+    ],
+)
+
+ppu_cc_library(
+    name = "silent_ot",
+    srcs = [
+        "ot-utils.cc",
+        "silent_ot.cc",
+        "silent_ot_pack.cc",
+    ],
+    hdrs = [
+        "mitccrh_exp.h",
+        "ot-utils.h",
+        "silent_ot.h",
+        "silent_ot_pack.h",
+        "utils.h",
+    ],
+    copts = [
+        "-march=native",
+        "-maes",
+        "-mrdseed",
+    ],
+    deps = [
+        "cheetah_io",
+        "//ppu/link",
+        "@com_github_emptoolkit_emp_ot//:emp-ot",
+        "@com_github_emptoolkit_emp_tool//:emp-tool",
+    ],
+)
+
+ppu_cc_test(
+    name = "silent_ot_test",
+    srcs = ["silent_ot_test.cc"],
+    copts = [
+        "-march=native",
+        "-maes",
+        "-mrdseed",
+    ],
+    deps = [
+        "silent_ot",
+    ],
+)
+
+ppu_cc_library(
+    name = "nonlinear_protocols",
+    srcs = ["nonlinear_protocols.cc"],
+    hdrs = ["nonlinear_protocols.h"],
+    copts = [
+        "-march=native",
+        "-maes",
+        "-mrdseed"
+    ],
+    deps = [
+        "silent_ot",
+    ],
+)

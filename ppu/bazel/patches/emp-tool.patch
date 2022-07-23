@@ -1,0 +1,13 @@
+diff --git a/emp-tool/utils/prg.h b/emp-tool/utils/prg.h
+index 5c6cda7..d7f1a44 100644
+--- a/emp-tool/utils/prg.h
++++ b/emp-tool/utils/prg.h
+@@ -80,7 +80,7 @@ class PRG { public:
+ 		} else {
+ 			block tmp[2];
+ 			random_block(tmp, 2);
+-			memcpy(data, tmp, nbytes);
++			memcpy(data, tmp, nbytes <= 32? nbytes : 32);
+ 		}
+ 	}
+ 

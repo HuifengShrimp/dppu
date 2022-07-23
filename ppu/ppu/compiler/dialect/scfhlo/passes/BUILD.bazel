@@ -1,0 +1,75 @@
+
+# Copyright 2021 Ant Group Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library")
+load("//bazel:ppu.bzl", "ppu_cc_library")
+
+package(
+    default_visibility = ["//visibility:public"],
+    licenses = ["notice"],
+)
+
+gentbl_cc_library(
+    name = "scfhlo_pass_inc_gen",
+    tbl_outs = [
+        (
+            ["-gen-pass-decls"],
+            "passes.h.inc",
+        ),
+    ],
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "passes.td",
+    deps = [
+        "@llvm-project//mlir:PassBaseTdFiles",
+    ],
+)
+
+ppu_cc_library(
+    name = "pass_details",
+    hdrs = [
+        "pass_details.h",
+    ],
+    visibility = [
+        "//visibility:private",  # This target is a private detail of pass implementations
+    ],
+    deps = [
+        ":scfhlo_pass_inc_gen",
+        "@llvm-project//mlir:Pass",
+    ],
+)
+
+ppu_cc_library(
+    name = "flatten_if_tuple",
+    srcs = ["flatten_if_tuple.cc"],
+    hdrs = ["passes.h"],
+    include_prefix = "tensorflow/compiler/mlir/hlo/include",
+    deps = [
+        ":pass_details",
+        "//ppu/compiler/dialect/scfhlo/IR:scfhlo_dialect",
+        "//ppu/utils:exception",
+        "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:StandardOpsTransforms",
+        "@org_tensorflow//tensorflow/compiler/mlir/hlo",
+    ],
+)
+
+ppu_cc_library(
+    name = "all_passes",
+    hdrs = ["register_passes.h"],
+    deps = [
+        ":flatten_if_tuple",
+    ],
+)

@@ -1,0 +1,75 @@
+diff --git a/emp-ot/ferret/ferret_cot.hpp b/emp-ot/ferret/ferret_cot.hpp
+index 3798998..055932b 100644
+--- a/emp-ot/ferret/ferret_cot.hpp
++++ b/emp-ot/ferret/ferret_cot.hpp
+@@ -137,12 +137,14 @@ void FerretCOT<T>::setup(std::string pre_file) {
+ 		OTPre<T> pre_ot_ini(ios[0], mpcot_ini.tree_height-1, mpcot_ini.tree_n);
+ 		LpnF2<T, 10> lpn(party, n_pre, k_pre, pool, io, pool->size());
+ 
+-		block pre_data_ini[k_pre+mpcot_ini.consist_check_cot_num];
++		block *pre_data_ini = new block[k_pre+mpcot_ini.consist_check_cot_num];
+ 		memset(this->ot_pre_data, 0, n_pre*16);
+ 
+ 		base_cot->cot_gen(&pre_ot_ini, pre_ot_ini.n);
+ 		base_cot->cot_gen(pre_data_ini, k_pre+mpcot_ini.consist_check_cot_num);
+ 		extend(ot_pre_data, &mpcot_ini, &pre_ot_ini, &lpn, pre_data_ini);
++
++        delete []pre_data_ini;
+ 	}
+ 
+ 	fut.get();
+diff --git a/emp-ot/ferret/mpcot_reg.h b/emp-ot/ferret/mpcot_reg.h
+index 6659aa7..6b01601 100644
+--- a/emp-ot/ferret/mpcot_reg.h
++++ b/emp-ot/ferret/mpcot_reg.h
+@@ -123,6 +123,10 @@ public:
+ 		for(int i = start; i < end; ++i)
+ 			exec_f2k_sender(senders[i], ot, sparse_vector+i*leave_n, 
+ 					ios[threads - 1], i);
++
++        for (int i = 0; i < threads; i++)
++            ios[i]->flush();
++
+ 		for (auto & f : fut) f.get();
+ 	}
+ 
+@@ -152,7 +156,7 @@ public:
+ 			block *ggm_tree_mem, IO *io, int i) {
+ 		sender->compute(ggm_tree_mem, Delta_f2k);
+ 		sender->template send_f2k<OTPre<IO>>(ot, io, i);
+-		io->flush();
++		//io->flush();
+ 		if(is_malicious)
+ 			sender->consistency_check_msg_gen(consist_check_VW+i);
+ 	}
+diff --git a/emp-ot/ferret/preot.h b/emp-ot/ferret/preot.h
+index 0ac7641..a0ae2d3 100644
+--- a/emp-ot/ferret/preot.h
++++ b/emp-ot/ferret/preot.h
+@@ -10,10 +10,6 @@ class OTPre { public:
+ 	block * pre_data = nullptr;
+ 	bool * bits = nullptr;
+ 	int n;
+-	vector<block*> pointers;
+-	vector<const bool*> choices;
+-	vector<const block*> pointers0;
+-	vector<const block*> pointers1;
+ 
+ 	CCRH ccrh;
+ 	int length, count;
+diff --git a/emp-ot/ferret/twokeyprp.h b/emp-ot/ferret/twokeyprp.h
+index fd6236d..c2361a3 100644
+--- a/emp-ot/ferret/twokeyprp.h
++++ b/emp-ot/ferret/twokeyprp.h
+@@ -9,8 +9,8 @@ class TwoKeyPRP { public:
+ 	emp::AES_KEY aes_key[2];
+ 
+ 	TwoKeyPRP(block seed0, block seed1) {
+-		AES_set_encrypt_key((const block)seed0, aes_key);
+-		AES_set_encrypt_key((const block)seed1, &aes_key[1]);
++		AES_set_encrypt_key(seed0, aes_key);
++		AES_set_encrypt_key(seed1, &aes_key[1]);
+ 	}
+ 
+ 	void node_expand_1to2(block *children, block parent) {
+

@@ -1,0 +1,395 @@
+
+# Copyright 2021 Ant Group Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+load("//bazel:ppu.bzl", "ppu_cc_binary", "ppu_cc_library", "ppu_cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+ppu_cc_library(
+    name = "symmetric_crypto",
+    srcs = [
+        "symmetric_crypto.cc",
+    ],
+    hdrs = [
+        "symmetric_crypto.h",
+    ],
+    # Openssl::libcrypto requires `dlopen`...
+    linkopts = ["-ldl"],
+    deps = [
+        "//ppu/utils:byte_container_view",
+        "//ppu/utils:exception",
+        "//ppu/utils:int128",
+        "@com_github_openssl_openssl//:openssl",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+ppu_cc_test(
+    name = "symmetric_crypto_test",
+    srcs = ["symmetric_crypto_test.cc"],
+    deps = [
+        ":symmetric_crypto",
+    ],
+)
+
+ppu_cc_library(
+    name = "gcm_crypto",
+    srcs = ["gcm_crypto.cc"],
+    hdrs = ["gcm_crypto.h"],
+    # Openssl::libcrypto requires `dlopen`...
+    linkopts = ["-ldl"],
+    deps = [
+        "//ppu/utils:byte_container_view",
+        "//ppu/utils:exception",
+        "//ppu/utils:int128",
+        "//ppu/utils:scope_guard",
+        "@com_github_openssl_openssl//:openssl",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+ppu_cc_test(
+    name = "gcm_crypto_test",
+    srcs = ["gcm_crypto_test.cc"],
+    deps = [
+        ":gcm_crypto",
+    ],
+)
+
+ppu_cc_library(
+    name = "pseudo_random_generator",
+    hdrs = ["pseudo_random_generator.h"],
+    deps = [
+        ":symmetric_crypto",
+    ],
+)
+
+ppu_cc_test(
+    name = "pseudo_random_generator_test",
+    srcs = ["pseudo_random_generator_test.cc"],
+    deps = [
+        ":pseudo_random_generator",
+    ],
+)
+
+ppu_cc_library(
+    name = "utils",
+    srcs = [
+        "utils.h",
+    ],
+    deps = [
+        "//ppu/crypto:pseudo_random_generator",
+    ],
+)
+
+ppu_cc_library(
+    name = "hash_interface",
+    srcs = ["hash_interface.h"],
+    deps = [
+        "//ppu/utils:byte_container_view",
+    ],
+)
+
+ppu_cc_library(
+    name = "random_oracle",
+    hdrs = ["random_oracle.h"],
+    deps = [
+        ":symmetric_crypto",
+    ],
+)
+
+ppu_cc_test(
+    name = "random_oracle_test",
+    srcs = ["random_oracle_test.cc"],
+    deps = [
+        ":random_oracle",
+        "//ppu/utils:hamming",
+    ],
+)
+
+ppu_cc_library(
+    name = "asymmetric_util",
+    srcs = ["asymmetric_util.cc"],
+    hdrs = ["asymmetric_util.h"],
+    deps = [
+        "//ppu/utils:byte_container_view",
+        "//ppu/utils:scope_guard",
+        "@com_github_openssl_openssl//:openssl",
+    ],
+)
+
+ppu_cc_library(
+    name = "ssl_hash",
+    srcs = ["ssl_hash.cc"],
+    hdrs = ["ssl_hash.h"],
+    # Openssl::libcrypto requires `dlopen`...
+    linkopts = ["-ldl"],
+    deps = [
+        ":hash_interface",
+        "//ppu/utils:exception",
+        "//ppu/utils:scope_guard",
+        "@com_github_openssl_openssl//:openssl",
+    ],
+)
+
+ppu_cc_test(
+    name = "ssl_hash_all_test",
+    srcs = ["ssl_hash_all_test.cc"],
+    deps = [
+        ":ssl_hash",
+    ],
+)
+
+ppu_cc_library(
+    name = "blake3_hash",
+    srcs = ["blake3_hash.cc"],
+    hdrs = ["blake3_hash.h"],
+    deps = [
+        ":hash_interface",
+        "//ppu/utils:int128",
+        "@com_github_blake3team_blake3//:blake3_c",
+    ],
+)
+
+ppu_cc_test(
+    name = "blake3_hash_test",
+    srcs = ["blake3_hash_test.cc"],
+    deps = [
+        ":blake3_hash",
+    ],
+)
+
+ppu_cc_library(
+    name = "asymmetric_crypto",
+    hdrs = ["asymmetric_crypto.h"],
+    deps = [
+        "//ppu/utils:byte_container_view",
+    ],
+)
+
+ppu_cc_library(
+    name = "asymmetric_sm2_crypto",
+    srcs = ["asymmetric_sm2_crypto.cc"],
+    hdrs = ["asymmetric_sm2_crypto.h"],
+    # Openssl::libcrypto requires `dlopen`...
+    linkopts = ["-ldl"],
+    deps = [
+        ":asymmetric_crypto",
+        ":asymmetric_util",
+        "//ppu/utils:exception",
+        "@com_github_openssl_openssl//:openssl",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+ppu_cc_test(
+    name = "asymmetric_sm2_crypto_test",
+    srcs = ["asymmetric_sm2_crypto_test.cc"],
+    deps = [
+        ":asymmetric_sm2_crypto",
+    ],
+)
+
+ppu_cc_library(
+    name = "asymmetric_rsa_crypto",
+    srcs = ["asymmetric_rsa_crypto.cc"],
+    hdrs = ["asymmetric_rsa_crypto.h"],
+    # Openssl::libcrypto requires `dlopen`...
+    linkopts = ["-ldl"],
+    deps = [
+        ":asymmetric_crypto",
+        ":asymmetric_util",
+        "//ppu/utils:exception",
+        "@com_github_openssl_openssl//:openssl",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+ppu_cc_test(
+    name = "asymmetric_rsa_crypto_test",
+    srcs = ["asymmetric_rsa_crypto_test.cc"],
+    deps = [
+        ":asymmetric_rsa_crypto",
+    ],
+)
+
+ppu_cc_library(
+    name = "hash_util",
+    srcs = ["hash_util.cc"],
+    hdrs = ["hash_util.h"],
+    deps = [
+        ":ssl_hash",
+        "//ppu/utils:int128",
+        "@com_github_blake3team_blake3//:blake3_c",
+    ],
+)
+
+ppu_cc_library(
+    name = "signing",
+    hdrs = ["signing.h"],
+    deps = [
+        "//ppu/utils:byte_container_view",
+    ],
+)
+
+ppu_cc_library(
+    name = "sm2_signing",
+    srcs = ["sm2_signing.cc"],
+    hdrs = ["sm2_signing.h"],
+    # Openssl::libcrypto requires `dlopen`...
+    linkopts = ["-ldl"],
+    deps = [
+        ":asymmetric_util",
+        ":signing",
+        "//ppu/utils:exception",
+        "@com_github_openssl_openssl//:openssl",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+ppu_cc_test(
+    name = "sm2_signing_test",
+    srcs = ["sm2_signing_test.cc"],
+    deps = [
+        ":sm2_signing",
+    ],
+)
+
+ppu_cc_library(
+    name = "rsa_signing",
+    srcs = ["rsa_signing.cc"],
+    hdrs = ["rsa_signing.h"],
+    # Openssl::libcrypto requires `dlopen`...
+    linkopts = ["-ldl"],
+    deps = [
+        ":signing",
+        "//ppu/utils:exception",
+        "//ppu/utils:scope_guard",
+        "@com_github_openssl_openssl//:openssl",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+ppu_cc_test(
+    name = "rsa_signing_test",
+    srcs = ["rsa_signing_test.cc"],
+    deps = [
+        ":asymmetric_util",
+        ":rsa_signing",
+    ],
+)
+
+ppu_cc_library(
+    name = "hmac",
+    srcs = ["hmac.cc"],
+    hdrs = ["hmac.h"],
+    linkopts = ["-ldl"],
+    deps = [
+        ":hash_interface",
+        "//ppu/utils:byte_container_view",
+        "//ppu/utils:exception",
+        "//ppu/utils:scope_guard",
+        "@com_github_openssl_openssl//:openssl",
+    ],
+)
+
+ppu_cc_library(
+    name = "hmac_sm3",
+    srcs = ["hmac_sm3.h"],
+    deps = [
+        ":hmac",
+    ],
+)
+
+ppu_cc_library(
+    name = "hmac_sha256",
+    srcs = ["hmac_sha256.h"],
+    deps = [
+        ":hmac",
+    ],
+)
+
+ppu_cc_test(
+    name = "hmac_all_test",
+    srcs = ["hmac_all_test.cc"],
+    deps = [
+        ":hmac_sha256",
+        ":hmac_sm3",
+    ],
+)
+
+ppu_cc_library(
+    name = "digital_envelope",
+    srcs = ["digital_envelope.cc"],
+    hdrs = ["digital_envelope.h"],
+    deps = [
+        ":asymmetric_rsa_crypto",
+        ":asymmetric_sm2_crypto",
+        ":gcm_crypto",
+        ":hmac_sm3",
+        ":pseudo_random_generator",
+        ":sm4_mac",
+        ":ssl_hash",
+        ":symmetric_crypto",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+ppu_cc_test(
+    name = "digital_envelope_test",
+    srcs = ["digital_envelope_test.cc"],
+    deps = [
+        ":digital_envelope",
+    ],
+)
+
+ppu_cc_library(
+    name = "sm4_mac",
+    srcs = ["sm4_mac.cc"],
+    hdrs = ["sm4_mac.h"],
+    deps = [
+        ":hmac_sm3",
+        ":ssl_hash",
+        ":symmetric_crypto",
+    ],
+)
+
+ppu_cc_test(
+    name = "sm4_mac_test",
+    srcs = ["sm4_mac_test.cc"],
+    deps = [
+        ":sm4_mac",
+    ],
+)
+
+ppu_cc_binary(
+    name = "random_oracle_bench",
+    srcs = ["random_oracle_bench.cc"],
+    deps = [
+        "//ppu/crypto:random_oracle",
+        "@com_github_google_benchmark//:benchmark_main",
+    ],
+)
+
+ppu_cc_binary(
+    name = "blake3_hash_bench",
+    srcs = ["blake3_hash_bench.cc"],
+    deps = [
+        "//ppu/crypto:blake3_hash",
+        "@com_github_google_benchmark//:benchmark_main",
+    ],
+)

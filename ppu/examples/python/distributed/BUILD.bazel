@@ -1,0 +1,130 @@
+
+# Copyright 2021 Ant Group Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_grpc_library", "py_proto_library")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "distributed",
+    srcs = ["__init__.py"],
+    deps = [
+        ":config",
+        ":context",
+        ":core",
+        ":daemon",
+        ":ppu_device",
+        ":py_device",
+    ],
+)
+
+proto_library(
+    name = "core_proto",
+    srcs = ["core.proto"],
+    deps = [
+        "//ppu:ppu_proto",
+    ],
+)
+
+py_proto_library(
+    name = "core_py_proto",
+    deps = [
+        ":core_proto",
+    ],
+)
+
+py_grpc_library(
+    name = "core_py_proto_grpc",
+    srcs = ["core_proto"],
+    deps = [
+        ":core_py_proto",
+    ],
+)
+
+py_library(
+    name = "core",
+    srcs = ["core.py"],
+    deps = [
+        ":core_py_proto",
+        ":core_py_proto_grpc",
+        "//ppu:ppu_py_proto",
+    ],
+)
+
+py_library(
+    name = "py_device",
+    srcs = ["py_device.py"],
+    deps = [
+        ":core",
+    ],
+)
+
+py_library(
+    name = "ppu_wrapper",
+    srcs = ["ppu_wrapper.py"],
+    deps = [
+        "//ppu:ppu_py_proto",
+        "//ppu/binding",
+    ],
+)
+
+py_library(
+    name = "ppu_device",
+    srcs = ["ppu_device.py"],
+    deps = [
+        ":core",
+        ":ppu_wrapper",
+        "//ppu:ppu_py_proto",
+        "//ppu/binding",
+    ],
+)
+
+py_library(
+    name = "config",
+    srcs = ["config.py"],
+    deps = [
+        ":core",
+        ":core_py_proto",
+    ],
+)
+
+py_library(
+    name = "context",
+    srcs = ["context.py"],
+    deps = [
+        ":core",
+        ":ppu_device",
+        ":py_device",
+    ],
+)
+
+py_binary(
+    name = "daemon",
+    srcs = ["daemon.py"],
+    data = [
+        "//examples/python/conf",
+    ],
+    deps = [
+        ":config",
+        ":context",
+        ":core",
+        ":core_py_proto",
+        ":core_py_proto_grpc",
+        "//examples/python/utils:dataset_utils",
+    ],
+)

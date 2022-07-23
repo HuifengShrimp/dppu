@@ -1,0 +1,3 @@
+[submodule "ppu"]
+	path = ppu
+	url = https://github.com/secretflow/ppu

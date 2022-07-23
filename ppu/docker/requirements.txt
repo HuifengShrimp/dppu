@@ -1,0 +1,17 @@
+grpcio==1.44.0
+numpy==1.22.2
+protobuf==3.19.4
+six==1.16.0
+dill==0.3.4
+tensorflow==2.8.0
+scikit-learn==1.0
+pandas==1.4.0
+jax==0.2.28
+jaxlib==0.1.76
+tensorflow_datasets==4.5.2
+keras==2.8.0
+absl-py==1.0.0
+
+# for tests
+xmlrunner==1.7.7
+psutil==5.9.0

@@ -1,0 +1,60 @@
+{
+    "id": "outsourcing.3pc",
+    "nodes": [{
+            "id": "node:0",
+            "addr": "127.0.0.1:58204"
+        },
+        {
+            "id": "node:1",
+            "addr": "127.0.0.1:58205"
+        },
+        {
+            "id": "node:2",
+            "addr": "127.0.0.1:58206"
+        },
+        {
+            "id": "node:3",
+            "addr": "127.0.0.1:58207"
+        },
+        {
+            "id": "node:4",
+            "addr": "127.0.0.1:58208"
+        }
+    ],
+    "devices": [{
+            "kind": "PPU",
+            "rank": 0,
+            "ppu_device": {
+                "node_ids": [
+                    "node:2",
+                    "node:3",
+                    "node:4"
+                ],
+                "ppu_internal_addrs": [
+                    "127.0.0.1:59207",
+                    "127.0.0.1:59208",
+                    "127.0.0.1:59209"
+                ],
+                "runtime_config": {
+                    "protocol": "ABY3",
+                    "field": "FM128",
+                    "sigmoid_mode": "REAL"
+                }
+            }
+        },
+        {
+            "kind": "PYRT",
+            "rank": 1,
+            "py_device": {
+                "node_id": "node:0"
+            }
+        },
+        {
+            "kind": "PYRT",
+            "rank": 2,
+            "py_device": {
+                "node_id": "node:1"
+            }
+        }
+    ]
+}

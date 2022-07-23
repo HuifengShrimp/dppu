@@ -1,0 +1,76 @@
+// Copyright 2021 Ant Group Co., Ltd.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+#pragma once
+
+#include "ppu/core/type.h"
+
+namespace ppu::mpc::aby3 {
+
+class AShrTy : public TypeImpl<AShrTy, RingTy, Secret, AShare> {
+  using Base = TypeImpl<AShrTy, RingTy, Secret, AShare>;
+
+ public:
+  using Base::Base;
+  static std::string_view getStaticId() { return "aby3.AShr"; }
+
+  explicit AShrTy(FieldType field) { field_ = field; }
+
+  size_t size() const override { return SizeOf(GetStorageType(field_)) * 2; }
+};
+
+class BShrTy : public TypeImpl<BShrTy, RingTy, Secret, BShare> {
+  using Base = TypeImpl<BShrTy, RingTy, Secret, BShare>;
+
+  // Theoretically, `B share` works in F2 (mod 2) ring, which means we can use
+  // single bit to represent a B share.
+  //
+  // But just like normal chips, data are normally batched processed with
+  // `byte`,  also manipulate multi-bits together. This member represent
+  // the number of valid bits for a multibits storage.
+  //
+  // the nbit_ of LSB are valid.
+  static constexpr size_t kInvalidBits = std::numeric_limits<size_t>::max();
+  size_t nbits_ = kInvalidBits;
+
+ public:
+  using Base::Base;
+  explicit BShrTy(FieldType field, size_t nbits = kInvalidBits) {
+    field_ = field;
+    nbits_ = nbits == kInvalidBits ? SizeOf(field) * 8 : nbits;
+    PPU_ENFORCE(nbits_ <= SizeOf(field) * 8);
+  }
+
+  static std::string_view getStaticId() { return "aby3.BShr"; }
+
+  void fromString(std::string_view detail) override {
+    auto comma = detail.find_first_of(',');
+    auto field_str = detail.substr(0, comma);
+    auto nbits_str = detail.substr(comma + 1);
+    PPU_ENFORCE(FieldType_Parse(std::string(field_str), &field_),
+                "parse failed from={}", detail);
+    nbits_ = std::stoul(std::string(nbits_str));
+  };
+
+  std::string toString() const override {
+    return fmt::format("{},{}", FieldType_Name(field()), nbits_);
+  }
+
+  size_t size() const override { return SizeOf(GetStorageType(field_)) * 2; }
+};
+
+void registerTypes();
+
+}  // namespace ppu::mpc::aby3

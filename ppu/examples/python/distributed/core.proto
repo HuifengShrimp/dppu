@@ -1,0 +1,97 @@
+//
+// Copyright 2021 Ant Group Co., Ltd.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+syntax = "proto3";
+
+package examples.python.distributed;
+
+import "ppu/ppu.proto";
+
+enum DeviceKind {
+  INVALID = 0;
+  // Python runtime, could launch any python executable.
+  PYRT = 1;
+  // PPU runtime, could launch PPU IR.
+  PPU = 2;
+}
+
+message NodeDesc {
+  // the unique node_id.
+  string id = 1;
+  // address of the node.
+  string addr = 2;
+}
+
+message PyDeviceDesc {
+  // py device owns a single node.
+  string node_id = 1;
+}
+
+message PpuDeviceDesc {
+  //
+  repeated string node_ids = 1;
+
+  // the length of ppu_internal_addrs and node_ids must match.
+  repeated string ppu_internal_addrs = 2;
+
+  //
+  ppu.RuntimeConfig runtime_config = 3;
+}
+
+message DeviceDesc {
+  // The device kind.
+  DeviceKind kind = 1;
+
+  // The device rank.
+  // A typical configuration is to set PPU as rank 0, and data providers
+  // are ranked from 1 to n.
+  int64 rank = 2;
+
+  PyDeviceDesc py_device = 3;
+
+  PpuDeviceDesc ppu_device = 4;
+}
+
+message WorldDesc {
+  // The world id, represent a unique secret flow.
+  string id = 1;
+
+  // The devices.
+  repeated DeviceDesc devices = 2;
+
+  // The node list, a virtual device (such like PPU) may have a list of nodes.
+  repeated NodeDesc nodes = 3;
+}
+
+service NodeService {
+  rpc Eval(EvalRequest) returns (EvalResponse) {}
+}
+
+message EvalRequest {
+  // from node id
+  string from_node_id = 1;
+  //
+  string tag = 2;
+  //
+  bytes task = 3;
+}
+
+message EvalResponse {
+  oneof result {
+    bytes value = 1;
+    bytes exception = 2;
+  }
+}

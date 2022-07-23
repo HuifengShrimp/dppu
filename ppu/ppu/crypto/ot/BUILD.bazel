@@ -1,0 +1,222 @@
+
+# Copyright 2021 Ant Group Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+load("//bazel:ppu.bzl", "ppu_cc_binary", "ppu_cc_library", "ppu_cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+ppu_cc_library(
+    name = "punctured_rand_ot",
+    srcs = [
+        "punctured_rand_ot.cc",
+    ],
+    hdrs = [
+        "punctured_rand_ot.h",
+    ],
+    deps = [
+        "//ppu/crypto:pseudo_random_generator",
+        "//ppu/crypto/ot:options",
+        "//ppu/link",
+    ],
+)
+
+ppu_cc_test(
+    name = "punctured_rand_ot_test",
+    srcs = ["punctured_rand_ot_test.cc"],
+    deps = [
+        ":punctured_rand_ot",
+        "//ppu/crypto:utils",
+        "//ppu/link:test_util",
+    ],
+)
+
+ppu_cc_library(
+    name = "base_ot",
+    srcs = ["base_ot.cc"],
+    hdrs = ["base_ot.h"],
+    defines = select({
+        "@bazel_tools//src/conditions:darwin": ["USE_PORTABLE_OT"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//ppu/utils:exception",
+        "//ppu/crypto:pseudo_random_generator",
+        "//ppu/crypto:utils",
+        "//ppu/link",
+        "//ppu/crypto:random_oracle",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/types:span",
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": ["@simplest_ot//:simplest_ot_portable"],
+        "//conditions:default": ["@simplest_ot//:simplest_ot_x86_asm"],
+    }),
+)
+
+ppu_cc_test(
+    name = "base_ot_test",
+    srcs = ["base_ot_test.cc"],
+    deps = [
+        ":base_ot",
+        "//ppu/link:test_util",
+    ],
+)
+
+ppu_cc_library(
+    name = "options",
+    hdrs = ["options.h"],
+    deps = [
+        "//ppu/utils:int128",
+    ],
+)
+
+ppu_cc_library(
+    name = "utils",
+    srcs = ["utils.cc"],
+    hdrs = [
+        "block.h",
+        "utils.h",
+    ],
+    deps = [
+        "//ppu/core:buffer",
+        "//ppu/utils:int128",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+ppu_cc_test(
+    name = "transpose_test",
+    srcs = ["transpose_test.cc"],
+    deps = [
+        ":utils",
+    ],
+)
+
+ppu_cc_library(
+    name = "iknp_ot_extension",
+    srcs = ["iknp_ot_extension.cc"],
+    hdrs = ["iknp_ot_extension.h"],
+    deps = [
+        ":options",
+        ":utils",
+        "//ppu/crypto:pseudo_random_generator",
+        "//ppu/crypto:random_oracle",
+        "//ppu/crypto:utils",
+        "//ppu/link",
+        "//ppu/utils:exception",
+        "//ppu/utils:int128",
+    ],
+)
+
+ppu_cc_test(
+    name = "iknp_ot_extension_test",
+    srcs = ["iknp_ot_extension_test.cc"],
+    deps = [
+        ":iknp_ot_extension",
+        "//ppu/link:test_util",
+    ],
+)
+
+ppu_cc_library(
+    name = "kkrt_ot_extension",
+    srcs = ["kkrt_ot_extension.cc"],
+    hdrs = ["kkrt_ot_extension.h"],
+    deps = [
+        ":aes",
+        ":options",
+        ":utils",
+        "//ppu/crypto:hash_util",
+        "//ppu/crypto:pseudo_random_generator",
+        "//ppu/crypto:random_oracle",
+        "//ppu/link",
+        "//ppu/utils:exception",
+        "//ppu/utils:int128",
+    ],
+)
+
+ppu_cc_test(
+    name = "kkrt_ot_extension_test",
+    srcs = ["kkrt_ot_extension_test.cc"],
+    deps = [
+        ":kkrt_ot_extension",
+        "//ppu/crypto:utils",
+        "//ppu/link:test_util",
+    ],
+)
+
+ppu_cc_library(
+    name = "aes",
+    srcs = ["aes.cc"],
+    hdrs = [
+        "aes.h",
+    ],
+    copts = ["-march=native"],
+    deps = [
+        ":utils",
+        "//ppu/utils:exception",
+        "//ppu/utils:int128",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+ppu_cc_test(
+    name = "aes_test",
+    srcs = ["aes_test.cc"],
+    deps = [
+        ":aes",
+        "//ppu/crypto:pseudo_random_generator",
+        "//ppu/utils:int128",
+    ],
+)
+
+ppu_cc_binary(
+    name = "aes_bench",
+    srcs = ["aes_bench.cc"],
+    deps = [
+        ":aes",
+        "//ppu/crypto:pseudo_random_generator",
+        "@com_github_google_benchmark//:benchmark_main",
+    ],
+)
+
+ppu_cc_binary(
+    name = "block_bench",
+    srcs = ["block_bench.cc"],
+    deps = [
+        ":utils",
+        "//ppu/crypto:pseudo_random_generator",
+        "@com_github_google_benchmark//:benchmark_main",
+    ],
+)
+
+ppu_cc_binary(
+    name = "matrix_transpose_bench",
+    srcs = ["matrix_transpose_bench.cc"],
+    deps = [
+        ":utils",
+        "//ppu/crypto:pseudo_random_generator",
+        "@com_github_google_benchmark//:benchmark_main",
+    ],
+)
+
+ppu_cc_binary(
+    name = "matrix_uint128_bench",
+    srcs = ["matrix_uint128_bench.cc"],
+    deps = [
+        ":utils",
+        "//ppu/crypto:pseudo_random_generator",
+        "@com_github_google_benchmark//:benchmark_main",
+    ],
+)

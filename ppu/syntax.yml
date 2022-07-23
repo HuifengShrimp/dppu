@@ -1,0 +1,48 @@
+# Support PEP 0263 comments:
+# coding=<encoding name>
+# -*- coding: <encoding name> -*-
+# vim: set fileencoding=<encoding name> :
+python:
+  ext: ['.py']
+  after: ['^#!', '^#.*coding:', '^#.*coding=', '^#.*fileencoding=']
+  comment:
+    open:   '\n'
+    close:  '\n\n'
+    prefix: '# '
+
+cpp:
+  ext: ['.cpp', '.hpp', '.cc', '.hh', '.h']
+  comment:
+    open:   ''
+    close:  '\n\n'
+    prefix: '// '
+
+# Most shells, really
+shell:
+  ext:  ['.sh']
+  after: ['^#!']
+  comment:
+    open:   '#\n'
+    close:  '#\n'
+    prefix: '# '
+
+protobuf:
+  ext:  ['.proto']
+  comment:
+    open:   '//\n'
+    close:  '//\n\n'
+    prefix: '// '
+
+tablegen:
+  ext:  ['.td']
+  comment:
+    open:   '//\n'
+    close:  '//\n\n'
+    prefix: '// '
+
+bazel:
+  ext:  ['.bazel']
+  comment:
+    open:   '\n'
+    close:  '\n\n'
+    prefix: '# '

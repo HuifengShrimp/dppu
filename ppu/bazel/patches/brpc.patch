@@ -1,0 +1,374 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 11db84d0..79133df8 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -54,6 +54,11 @@ config_setting(
+     visibility = ["//visibility:public"],
+ )
+ 
++config_setting(
++    name = "enable_gperf",
++    define_values = {"gperf": "on"},
++)
++
+ COPTS = [
+     "-DBTHREAD_USE_FAST_PTHREAD_MUTEX",
+     "-D__const__=",
+@@ -64,6 +69,9 @@ COPTS = [
+     "-D__STDC_LIMIT_MACROS",
+     "-D__STDC_CONSTANT_MACROS",
+     "-DGFLAGS_NS=google",
++    "-Wno-invalid-offsetof",
++    "-Wno-unused-parameter",
++    "-Wno-deprecated-declarations",
+ ] + select({
+     ":with_glog": ["-DBRPC_WITH_GLOG=1"],
+     "//conditions:default": ["-DBRPC_WITH_GLOG=0"],
+@@ -73,7 +81,10 @@ COPTS = [
+ }) + select({
+     ":with_thrift": ["-DENABLE_THRIFT_FRAMED_PROTOCOL=1"],
+     "//conditions:default": [""],
+-})
++}) + select({
++    "enable_gperf": ["-DBRPC_ENABLE_CPU_PROFILER"],
++    "//conditions:default": [],
++ })
+ 
+ LINKOPTS = [
+     "-lpthread",
+@@ -337,6 +348,7 @@ cc_library(
+     deps = [
+         "@com_google_protobuf//:protobuf",
+         "@com_github_gflags_gflags//:gflags",
++        "@com_github_openssl_openssl//:openssl",
+         "@zlib//:zlib",
+     ] + select({
+         ":with_glog": ["@com_github_google_glog//:glog"],
+@@ -344,9 +356,6 @@ cc_library(
+     }) + select({
+         ":darwin": [":macos_lib"],
+         "//conditions:default": [],
+-    }) + select({
+-        ":darwin": ["//external:ssl_macos"],
+-        "//conditions:default": ["//external:ssl"],
+     }),
+     includes = [
+         "src/",
+diff --git a/src/brpc/policy/http_rpc_protocol.cpp b/src/brpc/policy/http_rpc_protocol.cpp
+index 7bd06ec5..68b1a58d 100644
+--- a/src/brpc/policy/http_rpc_protocol.cpp
++++ b/src/brpc/policy/http_rpc_protocol.cpp
+@@ -617,12 +617,12 @@ void SerializeHttpRequest(butil::IOBuf* /*not used*/,
+ 
+     Span* span = accessor.span();
+     if (span) {
+-        hreq.SetHeader("x-bd-trace-id", butil::string_printf(
+-                           "%llu", (unsigned long long)span->trace_id()));
+-        hreq.SetHeader("x-bd-span-id", butil::string_printf(
+-                           "%llu", (unsigned long long)span->span_id()));
+-        hreq.SetHeader("x-bd-parent-span-id", butil::string_printf(
+-                           "%llu", (unsigned long long)span->parent_span_id()));
++        hreq.SetHeader("x-b3-traceid", butil::string_printf(
++                           "%016llx", (unsigned long long)span->trace_id()));
++        hreq.SetHeader("x-b3-spanid", butil::string_printf(
++                           "%016llx", (unsigned long long)span->span_id()));
++        hreq.SetHeader("x-b3-parentspanid", butil::string_printf(
++                           "%016llx", (unsigned long long)span->parent_span_id()));
+     }
+ }
+ 
+@@ -1282,22 +1282,22 @@ void ProcessHttpRequest(InputMessageBase *msg) {
+ 
+     Span* span = NULL;
+     const std::string& path = req_header.uri().path();
+-    const std::string* trace_id_str = req_header.GetHeader("x-bd-trace-id");
++    const std::string* trace_id_str = req_header.GetHeader("x-b3-traceid");
+     if (IsTraceable(trace_id_str)) {
+         uint64_t trace_id = 0;
+         if (trace_id_str) {
+-            trace_id = strtoull(trace_id_str->c_str(), NULL, 10);
++            trace_id = strtoull(trace_id_str->c_str(), NULL, 16);
+         }
+         uint64_t span_id = 0;
+-        const std::string* span_id_str = req_header.GetHeader("x-bd-span-id");
++        const std::string* span_id_str = req_header.GetHeader("x-b3-spanid");
+         if (span_id_str) {
+-            span_id = strtoull(span_id_str->c_str(), NULL, 10);
++            span_id = strtoull(span_id_str->c_str(), NULL, 16);
+         }
+         uint64_t parent_span_id = 0;
+         const std::string* parent_span_id_str =
+-            req_header.GetHeader("x-bd-parent-span-id");
++            req_header.GetHeader("x-b3-parentspanid");
+         if (parent_span_id_str) {
+-            parent_span_id = strtoull(parent_span_id_str->c_str(), NULL, 10);
++            parent_span_id = strtoull(parent_span_id_str->c_str(), NULL, 16);
+         }
+         span = Span::CreateServerSpan(
+             path, trace_id, span_id, parent_span_id, msg->base_real_us());
+diff --git a/src/bvar/default_variables.cpp b/src/bvar/default_variables.cpp
+index be02c50a..172dcbe4 100644
+--- a/src/bvar/default_variables.cpp
++++ b/src/bvar/default_variables.cpp
+@@ -110,8 +110,9 @@ static bool read_proc_status(ProcStat &stat) {
+         return -1;
+     }
+     const std::string& result = oss.str();
++    // macOS flags is actually a hex, ref https://github.com/apache/incubator-brpc/issues/1106
+     if (sscanf(result.c_str(), "%d %d %d %d"
+-                              "%d %u %ld %ld",
++                              "%d %x %ld %ld",
+                &stat.pid, &stat.ppid, &stat.pgrp, &stat.session,
+                &stat.tpgid, &stat.flags, &stat.priority, &stat.nice) != 8) {
+         PLOG(WARNING) << "Fail to sscanf";
+diff --git a/src/brpc/esp_message.cpp b/src/brpc/esp_message.cpp
+index 0c93c12f5..583181d34 100644
+--- a/src/brpc/esp_message.cpp
++++ b/src/brpc/esp_message.cpp
+@@ -52,6 +52,12 @@ EspMessage* EspMessage::New() const {
+     return new EspMessage;
+ }
+ 
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++EspMessage* EspMessage::New(::google::protobuf::Arena* arena) const {
++    return CreateMaybeMessage<EspMessage>(arena);
++}
++#endif
++
+ void EspMessage::Clear() {
+     head.body_len = 0;
+     body.clear();
+diff --git a/src/brpc/esp_message.h b/src/brpc/esp_message.h
+index 1b23974c7..a17fd917e 100644
+--- a/src/brpc/esp_message.h
++++ b/src/brpc/esp_message.h
+@@ -54,6 +54,9 @@ class EspMessage : public ::google::protobuf::Message {
+     // implements Message ----------------------------------------------
+ 
+     EspMessage* New() const;
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++    EspMessage* New(::google::protobuf::Arena* arena) const override;
++#endif
+     void CopyFrom(const ::google::protobuf::Message& from);
+     void MergeFrom(const ::google::protobuf::Message& from);
+     void CopyFrom(const EspMessage& from);
+diff --git a/src/brpc/memcache.cpp b/src/brpc/memcache.cpp
+index cd7ea30bb..60d6c7104 100644
+--- a/src/brpc/memcache.cpp
++++ b/src/brpc/memcache.cpp
+@@ -63,6 +63,12 @@ MemcacheRequest* MemcacheRequest::New() const {
+     return new MemcacheRequest;
+ }
+ 
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++MemcacheRequest* MemcacheRequest::New(::google::protobuf::Arena* arena) const {
++    return CreateMaybeMessage<MemcacheRequest>(arena);
++}
++#endif
++
+ void MemcacheRequest::Clear() {
+     _buf.clear();
+     _pipelined_count = 0;
+@@ -207,6 +213,13 @@ MemcacheResponse* MemcacheResponse::New() const {
+     return new MemcacheResponse;
+ }
+ 
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++MemcacheResponse*
++MemcacheResponse::New(::google::protobuf::Arena* arena) const {
++    return CreateMaybeMessage<MemcacheResponse>(arena);
++}
++#endif
++
+ void MemcacheResponse::Clear() {
+ }
+ 
+diff --git a/src/brpc/memcache.h b/src/brpc/memcache.h
+index bd54c3905..ab4645732 100644
+--- a/src/brpc/memcache.h
++++ b/src/brpc/memcache.h
+@@ -90,6 +90,9 @@ class MemcacheRequest : public ::google::protobuf::Message {
+ 
+     // Protobuf methods.
+     MemcacheRequest* New() const;
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++    MemcacheRequest* New(::google::protobuf::Arena* arena) const override;
++#endif
+     void CopyFrom(const ::google::protobuf::Message& from);
+     void MergeFrom(const ::google::protobuf::Message& from);
+     void CopyFrom(const MemcacheRequest& from);
+@@ -200,6 +203,9 @@ class MemcacheResponse : public ::google::protobuf::Message {
+     // implements Message ----------------------------------------------
+   
+     MemcacheResponse* New() const;
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++    MemcacheResponse* New(::google::protobuf::Arena* arena) const override;
++#endif
+     void CopyFrom(const ::google::protobuf::Message& from);
+     void MergeFrom(const ::google::protobuf::Message& from);
+     void CopyFrom(const MemcacheResponse& from);
+diff --git a/src/brpc/nshead_message.cpp b/src/brpc/nshead_message.cpp
+index e58de2a98..b74089a58 100644
+--- a/src/brpc/nshead_message.cpp
++++ b/src/brpc/nshead_message.cpp
+@@ -54,6 +54,12 @@ NsheadMessage* NsheadMessage::New() const {
+     return new NsheadMessage;
+ }
+ 
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++NsheadMessage* NsheadMessage::New(::google::protobuf::Arena* arena) const {
++    return CreateMaybeMessage<NsheadMessage>(arena);
++}
++#endif
++
+ void NsheadMessage::Clear() {
+     memset(&head, 0, sizeof(head));
+     body.clear();
+diff --git a/src/brpc/nshead_message.h b/src/brpc/nshead_message.h
+index 3f41454bc..de8810ffa 100644
+--- a/src/brpc/nshead_message.h
++++ b/src/brpc/nshead_message.h
+@@ -50,6 +50,9 @@ class NsheadMessage : public ::google::protobuf::Message {
+     // implements Message ----------------------------------------------
+   
+     NsheadMessage* New() const;
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++    NsheadMessage* New(::google::protobuf::Arena* arena) const override;
++#endif
+     void CopyFrom(const ::google::protobuf::Message& from);
+     void MergeFrom(const ::google::protobuf::Message& from);
+     void CopyFrom(const NsheadMessage& from);
+diff --git a/src/brpc/protocol.cpp b/src/brpc/protocol.cpp
+index 83846a055..8353fdff9 100644
+--- a/src/brpc/protocol.cpp
++++ b/src/brpc/protocol.cpp
+@@ -203,7 +203,11 @@ BUTIL_FORCE_INLINE bool ParsePbFromZeroCopyStreamInlined(
+     // According to source code of pb, SetTotalBytesLimit is not a simple set,
+     // avoid calling the function when the limit is definitely unreached.
+     if (PB_TOTAL_BYETS_LIMITS < FLAGS_max_body_size) {
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++        decoder.SetTotalBytesLimit(INT_MAX);
++#else
+         decoder.SetTotalBytesLimit(INT_MAX, -1);
++#endif
+     }
+     return msg->ParseFromCodedStream(&decoder) && decoder.ConsumedEntireMessage();
+ }
+diff --git a/src/brpc/redis.cpp b/src/brpc/redis.cpp
+index 50cab0866..c482c5087 100644
+--- a/src/brpc/redis.cpp
++++ b/src/brpc/redis.cpp
+@@ -59,6 +59,12 @@ RedisRequest* RedisRequest::New() const {
+     return new RedisRequest;
+ }
+ 
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++RedisRequest* RedisRequest::New(::google::protobuf::Arena* arena) const {
++    return CreateMaybeMessage<RedisRequest>(arena);
++}
++#endif
++
+ void RedisRequest::Clear() {
+     _ncommand = 0;
+     _has_error = false;
+@@ -271,6 +277,12 @@ RedisResponse* RedisResponse::New() const {
+     return new RedisResponse;
+ }
+ 
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++RedisResponse* RedisResponse::New(::google::protobuf::Arena* arena) const {
++    return CreateMaybeMessage<RedisResponse>(arena);
++}
++#endif
++
+ void RedisResponse::Clear() {
+     _first_reply.Reset();
+     _other_replies = NULL;
+diff --git a/src/brpc/redis.h b/src/brpc/redis.h
+index d90da9eb5..dfaa25dc5 100644
+--- a/src/brpc/redis.h
++++ b/src/brpc/redis.h
+@@ -108,6 +108,9 @@ class RedisRequest : public ::google::protobuf::Message {
+ 
+     // Protobuf methods.
+     RedisRequest* New() const;
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++    RedisRequest* New(::google::protobuf::Arena* arena) const override;
++#endif
+     void CopyFrom(const ::google::protobuf::Message& from);
+     void MergeFrom(const ::google::protobuf::Message& from);
+     void CopyFrom(const RedisRequest& from);
+@@ -178,6 +181,9 @@ class RedisResponse : public ::google::protobuf::Message {
+     // implements Message ----------------------------------------------
+   
+     RedisResponse* New() const;
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++    RedisResponse* New(::google::protobuf::Arena* arena) const override;
++#endif
+     void CopyFrom(const ::google::protobuf::Message& from);
+     void MergeFrom(const ::google::protobuf::Message& from);
+     void CopyFrom(const RedisResponse& from);
+diff --git a/src/brpc/serialized_request.cpp b/src/brpc/serialized_request.cpp
+index 23beeb722..499738f6c 100644
+--- a/src/brpc/serialized_request.cpp
++++ b/src/brpc/serialized_request.cpp
+@@ -53,6 +53,13 @@ SerializedRequest* SerializedRequest::New() const {
+     return new SerializedRequest;
+ }
+ 
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++SerializedRequest*
++SerializedRequest::New(::google::protobuf::Arena* arena) const {
++    return CreateMaybeMessage<SerializedRequest>(arena);
++}
++#endif
++
+ void SerializedRequest::Clear() {
+     _serialized.clear();
+ }
+diff --git a/src/brpc/serialized_request.h b/src/brpc/serialized_request.h
+index c59495dbe..2e30dde9a 100644
+--- a/src/brpc/serialized_request.h
++++ b/src/brpc/serialized_request.h
+@@ -44,6 +44,9 @@ class SerializedRequest : public ::google::protobuf::Message {
+     // implements Message ----------------------------------------------
+   
+     SerializedRequest* New() const;
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++    SerializedRequest* New(::google::protobuf::Arena* arena) const override;
++#endif
+     void CopyFrom(const ::google::protobuf::Message& from);
+     void CopyFrom(const SerializedRequest& from);
+     void Clear();
+diff --git a/src/brpc/thrift_message.cpp b/src/brpc/thrift_message.cpp
+index c3be85a50..77e812b56 100644
+--- a/src/brpc/thrift_message.cpp
++++ b/src/brpc/thrift_message.cpp
+@@ -59,6 +59,13 @@ ThriftFramedMessage* ThriftFramedMessage::New() const {
+     return new ThriftFramedMessage;
+ }
+ 
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++ThriftFramedMessage*
++ThriftFramedMessage::New(::google::protobuf::Arena* arena) const {
++    return CreateMaybeMessage<ThriftFramedMessage>(arena);
++}
++#endif
++
+ void ThriftFramedMessage::Clear() {
+     body.clear();
+     if (_own_raw_instance) {
+diff --git a/src/brpc/thrift_message.h b/src/brpc/thrift_message.h
+index a152b1649..8d39548d3 100644
+--- a/src/brpc/thrift_message.h
++++ b/src/brpc/thrift_message.h
+@@ -84,6 +84,9 @@ friend class ThriftStub;
+     // implements Message ----------------------------------------------
+   
+     ThriftFramedMessage* New() const;
++#if GOOGLE_PROTOBUF_VERSION >= 3006000
++    ThriftFramedMessage* New(::google::protobuf::Arena* arena) const override;
++#endif
+     void CopyFrom(const ::google::protobuf::Message& from);
+     void MergeFrom(const ::google::protobuf::Message& from);
+     void CopyFrom(const ThriftFramedMessage& from);

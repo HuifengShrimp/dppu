@@ -1,0 +1,45 @@
+{
+    "id": "colocated.2pc",
+    "devices": [{
+            "kind": "PPU",
+            "ppuDevice": {
+                "nodeIds": [
+                    "node:0",
+                    "node:1"
+                ],
+                "ppuInternalAddrs": [
+                    "127.0.0.1:58677",
+                    "127.0.0.1:58678"
+                ],
+                "runtimeConfig": {
+                    "protocol": "SEMI2K",
+                    "field": "FM128",
+                    "sigmoidMode": "REAL"
+                }
+            }
+        },
+        {
+            "kind": "PYRT",
+            "rank": "1",
+            "pyDevice": {
+                "nodeId": "node:0"
+            }
+        },
+        {
+            "kind": "PYRT",
+            "rank": "2",
+            "pyDevice": {
+                "nodeId": "node:1"
+            }
+        }
+    ],
+    "nodes": [{
+            "id": "node:0",
+            "addr": "127.0.0.1:57204"
+        },
+        {
+            "id": "node:1",
+            "addr": "127.0.0.1:57205"
+        }
+    ]
+}
