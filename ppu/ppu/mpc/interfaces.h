@@ -163,6 +163,8 @@ class ICompute : public Interface {
   METHOD5(MatMulSP, ArrayRef, ArrayRef, ArrayRef, int64_t, int64_t, int64_t)
   METHOD5(MatMulSS, ArrayRef, ArrayRef, ArrayRef, int64_t, int64_t, int64_t)
 
+  METHOD4(LogRegAll, ArrayRef, ArrayRef, ArrayRef, int64_t, int64_t)
+
   METHOD1(MsbP, ArrayRef, ArrayRef)
   METHOD1(MsbS, ArrayRef, ArrayRef)
 };

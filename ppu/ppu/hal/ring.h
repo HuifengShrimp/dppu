@@ -41,6 +41,8 @@ Value _mul(HalContext* ctx, const Value& x, const Value& y);
 
 Value _matmul(HalContext* ctx, const Value& x, const Value& y);
 
+Value _logreg(HalContext* ctx, const Value& x, const Value& w, const Value& y, size_t M, size_t N);
+
 Value _and(HalContext* ctx, const Value& x, const Value& y);
 
 Value _xor(HalContext* ctx, const Value& x, const Value& y);

@@ -483,40 +483,40 @@ TYPED_TEST(MathUnaryTest, Reciprocal) {
 
 // TODO(junfeng): Reopen commented tests.
 
-// TYPED_TEST(MathUnaryTest, Log) {
-//   using IN_DT = typename std::tuple_element<0, TypeParam>::type;
-//   using IN_VT = typename std::tuple_element<1, TypeParam>::type;
-//   using RES_DT = float;
+TYPED_TEST(MathUnaryTest, Log) {
+  using IN_DT = typename std::tuple_element<0, TypeParam>::type;
+  using IN_VT = typename std::tuple_element<1, TypeParam>::type;
+  using RES_DT = float;
 
-//   // GIVEN
-//   xt::xarray<IN_DT> x = test::xt_random<IN_DT>({5, 6}, 0.5, 10);
-//   xt::xarray<float> log_x = xt::log(xt::cast<float>(x));
+  // GIVEN
+  xt::xarray<IN_DT> x = test::xt_random<IN_DT>({5, 6}, 0.5, 10);
+  xt::xarray<float> log_x = xt::log(xt::cast<float>(x));
 
-//   // WHAT
-//   auto z = test::EvalUnaryOp<RES_DT>(IN_VT(), log, x);
+  // WHAT
+  auto z = test::EvalUnaryOp<RES_DT>(IN_VT(), log, x);
 
-//   // THEN
-//   EXPECT_TRUE(xt::allclose(log_x, z, 0.1, 0.001)) << log_x << std::endl << z;
-// }
+  // THEN
+  EXPECT_TRUE(xt::allclose(log_x, z, 0.1, 0.001)) << log_x << std::endl << z;
+}
 
-// TYPED_TEST(MathUnaryTest, Logistic) {
-//   using IN_DT = typename std::tuple_element<0, TypeParam>::type;
-//   using IN_VT = typename std::tuple_element<1, TypeParam>::type;
-//   using RES_DT = float;
+TYPED_TEST(MathUnaryTest, Logistic) {
+  using IN_DT = typename std::tuple_element<0, TypeParam>::type;
+  using IN_VT = typename std::tuple_element<1, TypeParam>::type;
+  using RES_DT = float;
 
-//   // GIVEN
-//   xt::xarray<IN_DT> x = test::xt_random<IN_DT>({5, 6});
-//   xt::xarray<float> x_logisitic = 1.0 / (1.0 + xt::exp(-xt::cast<float>(x)));
+  // GIVEN
+  xt::xarray<IN_DT> x = test::xt_random<IN_DT>({5, 6});
+  xt::xarray<float> x_logisitic = 1.0 / (1.0 + xt::exp(-xt::cast<float>(x)));
 
-//   // WHAT
-//   auto z = test::EvalUnaryOp<RES_DT>(IN_VT(), logistic, x);
+  // WHAT
+  auto z = test::EvalUnaryOp<RES_DT>(IN_VT(), logistic, x);
 
-//   // THEN
-//   EXPECT_TRUE(xt::allclose(x_logisitic, z, 0.01, 0.001))
-//       << x << std::endl
-//       << x_logisitic << std::endl
-//       << z;
-// }
+  // THEN
+  EXPECT_TRUE(xt::allclose(x_logisitic, z, 0.01, 0.001))
+      << x << std::endl
+      << x_logisitic << std::endl
+      << z;
+}
 
 TEST(MathTest, Select) {
   // GIVEN

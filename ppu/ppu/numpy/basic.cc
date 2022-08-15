@@ -186,4 +186,9 @@ hal::Value transpose(HalContext* ctx, const hal::Value& in) {
   return hal::transpose(ctx, in);
 }
 
+hal::Value logreg(HalContext* ctx, const hal::Value& x, const hal::Value& w, const hal::Value& y,size_t M, size_t N){
+  PPU_TRACE_OP(ctx, x, w, y);
+  return hal::logreg(ctx, x, w, y, M, N);
+}
+
 }  // namespace ppu::numpy

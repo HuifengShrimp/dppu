@@ -41,6 +41,9 @@ class Beaver {
 
   // Return size of random bits, with given field.
   virtual ArrayRef RandBit(FieldType field, size_t size) = 0;
+
+  // Return correlated randomness of FSS.
+  virtual LR_set lr(FieldType field, size_t M, size_t N) = 0;
 };
 
 }  // namespace ppu::mpc

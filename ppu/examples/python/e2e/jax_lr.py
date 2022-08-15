@@ -18,6 +18,12 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from sklearn import metrics
+import sys
+import os
+
+# curPath = os.path.abspath(os.path.dirname('/home/admin/dev/examples/'))
+# rootPath = os.path.split(curPath)[0]
+# sys.path.append(rootpath)
 
 import examples.python.utils.dataset_utils as dataset_utils
 
@@ -86,16 +92,20 @@ class LogitRegression:
 
 def run_on_cpu():
     x, y = dataset_utils.load_full_dataset()
+    print("x")
+    print(x.shape)
+    print("y")
+    print(y.shape)
 
     lr = LogitRegression()
 
-    # w0, b0 = lr.fit_auto_grad(x, y)
-    w0, b0 = jax.jit(lr.fit_auto_grad)(x, y)
+    w0, b0 = lr.fit_auto_grad(x, y)
+    # w0, b0 = jax.jit(lr.fit_auto_grad)(x, y)
     print(w0, b0)
     print("AUC={}".format(metrics.roc_auc_score(y, predict(x, w0, b0))))
 
-    # w1, b1 = lr.fit_manual_grad(x, y)
-    w1, b1 = jax.jit(lr.fit_manual_grad)(x, y)
+    w1, b1 = lr.fit_manual_grad(x, y)
+    # w1, b1 = jax.jit(lr.fit_manual_grad)(x, y)
     print(w1, b1)
     print("AUC={}".format(metrics.roc_auc_score(y, predict(x, w1, b1))))
 

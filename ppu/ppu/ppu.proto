@@ -101,6 +101,7 @@ enum ProtocolKind {
   SEMI2K = 2;
   ABY3 = 3;
   CHEETAH = 4;
+  FSS = 5;
 }
 
 // The ppu Value proto, used for ppu value serialization.

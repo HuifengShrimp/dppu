@@ -46,6 +46,8 @@ typedef ppu::mpc::semi2k::MatMulAP MatMulAP;
 
 typedef ppu::mpc::semi2k::MatMulAA MatMulAA;
 
+typedef ppu::mpc::semi2k::LogReg LogReg;
+
 class TruncPrA : public UnaryWithBitsKernel {
  private:
   bool heuristic = true;

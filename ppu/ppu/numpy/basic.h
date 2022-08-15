@@ -178,4 +178,7 @@ hal::Value slice(HalContext* ctx, const hal::Value& input,
 // @param in, the param
 hal::Value transpose(HalContext* ctx, const hal::Value& in);
 
+///the logistic regression function
+hal::Value logreg(HalContext* ctx, const hal::Value& x, hal::Value& w, hal::Value& y, size_t M, size_t N);
+
 }  // namespace ppu::numpy

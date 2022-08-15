@@ -48,6 +48,8 @@ class BeaverTfp : public Beaver {
   Beaver::Pair Trunc(FieldType field, size_t size, size_t bits) override;
 
   ArrayRef RandBit(FieldType field, size_t size) override;
+
+  Beaver::LR_set lr(FieldType field, size_t M, size_t N) override;
 };
 
 }  // namespace ppu::mpc

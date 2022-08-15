@@ -17,8 +17,10 @@
 // To run the example, start two terminals:
 // > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/perfect_logit_a.csv --has_label=true
 // > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/perfect_logit_b.csv --rank=1
-// clang-format on
 
+// clang-format on
+// > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/breast_cancer_b.csv --rank=1 --has_label=true
+// > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/breast_cancer_a.csv
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -36,7 +38,7 @@
 namespace np = ppu::numpy;
 
 ppu::hal::Value train_step(ppu::HalContext* ctx, const ppu::hal::Value& x,
-                           const ppu::hal::Value& y, const ppu::hal::Value& w) {
+                           const ppu::hal::Value& y, const ppu::hal::Value& w) {                          
   // Padding x
   auto padding = np::ones(ctx, {x.shape()[0], int64_t(1)}, ppu::DT_FXP);
   auto padded_x = np::concatenate(ctx, x, ppu::hal::p2s(ctx, padding), 1);
@@ -157,6 +159,7 @@ std::pair<ppu::hal::Value, ppu::hal::Value> infeed(ppu::device::Processor* proc,
 }
 
 int main(int argc, char** argv) {
+  // terminal input. 
   llvm::cl::ParseCommandLineOptions(argc, argv);
   // read dataset.
   xt::xarray<float> ds;
@@ -169,9 +172,12 @@ int main(int argc, char** argv) {
     ds = xt::load_csv<float>(file, ',', SkipRows.getValue());
   }
 
-  auto proc = MakeProcessor();
+  //set protocol, field
+  auto proc = MakeProcessor(); 
+  //link party, rank, mesh
   auto hctx = proc->hctx();
 
+  //get x and y
   const auto& [x, y] = infeed(proc.get(), ds, HasLabel.getValue());
 
   const auto w = train(hctx, x, y, NumEpoch.getValue(), BatchSize.getValue());

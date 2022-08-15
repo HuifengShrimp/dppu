@@ -31,7 +31,10 @@ namespace ppu::mpc::fss {
 ArrayRef LogReg::proc(KernelEvalContext* ctx, const ArrayRef& x,
                       const ArrayRef& y, const ArrayRef& w,
                       int64_t M, int64_t N) const {
+  std::cout<<"******************logreg start***************************"<<std::endl;
   PPU_TRACE_OP(this, x, y, w);
+
+  //directly input x,y,w
 
   const auto field = x.eltype().as<Ring2k>()->field();
   auto* comm = ctx->caller()->getState<Communicator>();
@@ -72,6 +75,7 @@ ArrayRef LogReg::proc(KernelEvalContext* ctx, const ArrayRef& x,
   ArrayRef iden2(makeType<RingTy>(field), M) ;
   std::memset(iden2.data(), 2, iden2.buf()->size());
   
+  //Delta
   auto w1 = ring_sub(ring_sub(ring_sub(ring_sub(
   ring_add(ring_add(ring_add(ring_add(ring_add(ring_add(ring_add(ring_add(ring_add(
   ring_mmul(iden2, x_r1, 1, N, M), ring_mmul(iden2, r1, 1, N, M)),
@@ -96,7 +100,11 @@ ArrayRef LogReg::proc(KernelEvalContext* ctx, const ArrayRef& x,
     ring_mmul(r3, r1, 1, N, M)
   );
 
+  std::cout<<"*******************logreg finish*******************"<<std::endl;
+
   return w1;              
 }
+
+
 
 }  // namespace ppu::mpc::fss

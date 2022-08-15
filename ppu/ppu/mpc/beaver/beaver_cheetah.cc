@@ -124,4 +124,53 @@ ArrayRef BeaverCheetah::RandBit(FieldType field, size_t size) {
   return a;
 }
 
+Beaver::LR_set BeaverCheetah::lr(FieldType field, size_t M, size_t N){
+
+  
+  auto r1 = prgCreateArray(field, M * N, seed_, &counter_, NULL);
+  auto r2 = prgCreateArray(field, 1 * N, seed_, &counter_, NULL);
+  auto c1 = prgCreateArray(field, 1 * M, seed_, &counter_, NULL);
+  
+
+  //r1^T
+  size_t i = 0, j = 0, index;
+  ArrayRef r1T(makeType<RingTy>(field),N * M);
+  for ( i = 0 ; i < r1.elsize() ; i++){
+    index = (i % N) * M + (i / N);
+    r1T.at<int32_t>(index) = r1.at<int32_t>(i);
+  }
+  //c1=r2r1^T(1*N*N*M)
+  c1 = ring_mmul(r2,r1T,1,M,N);
+
+  //c2=r2(x')T r1
+  ArrayRef c2(makeType<RingTy>(field), M*N*N) ;
+  for( i = 0 ; i < M * N; i++){
+    for( j = 0 ; j < N; j++){
+      assignment(field, c2, i*N+j, ring_mul(ring_others(field, 1, r2.at<int32_t>(j)),
+      ring_others(field, 1, r1T.at<int32_t>(i))).at<int32_t>(0));
+    }
+  }
+
+  //c3 = r2·r1T·r1
+  auto c3 = prgCreateArray(field, 1 * N, seed_, &counter_, NULL);
+  c3 = ring_mmul(c1,r1,1,N,M);
+
+  auto r3 = prgCreateArray(field, M * 1, seed_, &counter_, NULL);
+
+  //r3^T
+  ArrayRef r3T(makeType<RingTy>(field),1*M);
+  for ( i = 0 ; i < r3.elsize() ; i++){
+    index = (i % 1) * M + (i/1);
+    r3T.at<int32_t>(index) = r3.at<int32_t>(i);
+  }
+
+   //c4 = r3^T·r1
+  auto c4 = ring_mmul(r3T,r1,1,N,M);
+
+  //c5 = r1^Tr1
+  auto c5 = ring_mmul(r1T,r1,N,N,M);
+
+  return {r1,r2,r3,c1,c2,c3,c4,c5};
+}
+
 }  // namespace ppu::mpc

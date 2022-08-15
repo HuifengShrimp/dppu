@@ -53,6 +53,7 @@ ArrayRef _Lazy2A(Object* obj, const ArrayRef& in) {
 #define _TruncPrA(in, bits) ctx->caller()->call("TruncPrA", in, bits)
 #define _MatMulAP(A, B, M, N, K) ctx->caller()->call("MatMulAP", A, B, M, N, K)
 #define _MatMulAA(A, B, M, N, K) ctx->caller()->call("MatMulAA", A, B, M, N, K)
+#define _LogReg(A, B, C, M, N) ctx->caller()->call("LogReg", A, B, C, M, N)
 #define _B2P(x) ctx->caller()->call("B2P", x)
 #define _P2B(x) ctx->caller()->call("P2B", x)
 #define _A2B(x) ctx->caller()->call("A2B", x)
@@ -144,6 +145,13 @@ ArrayRef MatMulSS::proc(KernelEvalContext* ctx, const ArrayRef& A,
     return _MatMulAA(_2A(A), _2A(B), M, N, K);
   }
   return _MatMulAA(A, B, M, N, K);
+}
+
+ArrayRef LogRegAll::proc(KernelEvalContext* ctx, const ArrayRef& A,
+                         const ArrayRef& B, const ArrayRef& C, int64_t M,
+                         int64_t N) const{
+  PPU_TRACE_OP(this, A, B, C);
+  return _LogReg(A, B, C, M, N);
 }
 
 ArrayRef AndSP::proc(KernelEvalContext* ctx, const ArrayRef& lhs,

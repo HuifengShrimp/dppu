@@ -113,6 +113,16 @@ class MatMulSS : public MatmulKernel {
                 int64_t M, int64_t N, int64_t K) const override;
 };
 
+class LogRegAll : public LogRegKernel {
+ public:
+  static constexpr char kName[] = "LogRegAll";
+
+  Kind kind() const override { return Kind::kDynamic; }
+
+  ArrayRef proc(KernelEvalContext* ctx, const ArrayRef& A, const ArrayRef& B, const ArrayRef& C,
+                int64_t M, int64_t N) const override;
+};
+
 class AndSP : public BinaryKernel {
  public:
   static constexpr char kName[] = "AndSP";

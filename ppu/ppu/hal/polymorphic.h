@@ -53,6 +53,13 @@ Value bitwise_or(HalContext* ctx, const Value& x, const Value& y);
 // @param y, the second parameter
 Value matmul(HalContext* ctx, const Value& x, const Value& y);
 
+/// logistic regression gate
+// @param x, the features
+// @param w, the coefficients
+// @param y, the labels
+Value logreg(HalContext* ctx, const Value& x, const Value&w, const Value& y, size_t M, size_t N);
+
+
 /// general element-wise bitwise equal operator
 // @param x, the first parameter
 // @param y, the second parameter

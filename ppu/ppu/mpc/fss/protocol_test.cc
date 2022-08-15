@@ -21,16 +21,16 @@
 
 namespace ppu::mpc::test {
 
-INSTANTIATE_TEST_SUITE_P(
-    fssComputeTest, ComputeTest,
-    testing::Combine(testing::Values(makeFSSProtocol),  //
-                     testing::Values(2, 3, 5),             //
-                     testing::Values(FieldType::FM32, FieldType::FM64,
-                                     FieldType::FM128)),
-    [](const testing::TestParamInfo<ComputeTest::ParamType>& info) {
-      return fmt::format("{}x{}", std::get<1>(info.param),
-                         std::get<2>(info.param));
-    });
+// INSTANTIATE_TEST_SUITE_P(
+//     fssComputeTest, ComputeTest,
+//     testing::Combine(testing::Values(makeFSSProtocol),  //
+//                      testing::Values(2, 3, 5),             //
+//                      testing::Values(FieldType::FM32, FieldType::FM64,
+//                                      FieldType::FM128)),
+//     [](const testing::TestParamInfo<ComputeTest::ParamType>& info) {
+//       return fmt::format("{}x{}", std::get<1>(info.param),
+//                          std::get<2>(info.param));
+//     });
 
 INSTANTIATE_TEST_SUITE_P(
     fssArithmeticTest, ArithmeticTest,
@@ -43,15 +43,15 @@ INSTANTIATE_TEST_SUITE_P(
                          std::get<2>(info.param));
     });
 
-INSTANTIATE_TEST_SUITE_P(
-    fssBooleanTest, BooleanTest,
-    testing::Combine(testing::Values(makeFSSProtocol),  //
-                     testing::Values(2, 3, 5),             //
-                     testing::Values(FieldType::FM32, FieldType::FM64,
-                                     FieldType::FM128)),
-    [](const testing::TestParamInfo<BooleanTest::ParamType>& info) {
-      return fmt::format("{}x{}", std::get<1>(info.param),
-                         std::get<2>(info.param));
-    });
+// INSTANTIATE_TEST_SUITE_P(
+//     fssBooleanTest, BooleanTest,
+//     testing::Combine(testing::Values(makeFSSProtocol),  //
+//                      testing::Values(2, 3, 5),             //
+//                      testing::Values(FieldType::FM32, FieldType::FM64,
+//                                      FieldType::FM128)),
+//     [](const testing::TestParamInfo<BooleanTest::ParamType>& info) {
+//       return fmt::format("{}x{}", std::get<1>(info.param),
+//                          std::get<2>(info.param));
+//     });
 
 }  // namespace ppu::mpc::test

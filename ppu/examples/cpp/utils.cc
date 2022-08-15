@@ -27,7 +27,7 @@ llvm::cl::opt<uint32_t> Rank("rank", llvm::cl::init(0),
                              llvm::cl::desc("self rank"));
 llvm::cl::opt<uint32_t> ProtocolKind(
     "protocol_kind", llvm::cl::init(2),
-    llvm::cl::desc("1 for REF2k, 2 for SEMI2k, 3 for ABY3"));
+    llvm::cl::desc("1 for REF2k, 2 for SEMI2k, 3 for ABY3, 4 for CHEETAH"));
 llvm::cl::opt<uint32_t> Field(
     "field", llvm::cl::init(3),
     llvm::cl::desc("1 for Ring32, 2 for Ring64, 3 for Ring128"));
@@ -43,6 +43,7 @@ std::shared_ptr<ppu::link::Context> MakeLink(const std::string& parties,
     lctx_desc.parties.push_back({id, hosts[rank]});
   }
   auto lctx = ppu::link::FactoryBrpc().CreateContext(lctx_desc, rank);
+  //Mesh : infinite grid networks
   lctx->ConnectToMesh();
   return lctx;
 }
@@ -56,6 +57,7 @@ std::unique_ptr<ppu::device::Processor> MakeProcessor(
   config.set_field(field);
   config.set_enable_type_checker(verbose);
   config.set_enable_action_trace(verbose);
+  // config.set_sigmoid_mode(ppu::MM1);
 
   auto proc = std::make_unique<ppu::device::Processor>(config, lctx);
 

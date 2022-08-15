@@ -246,6 +246,11 @@ Value _matmul_ss(HalContext* ctx, const Value& x, const Value& y) {
                       DeduceDotShape(x.shape(), y.shape()));
 }
 
+Value _logreg_all(HalContext* ctx, const Value& x, const Value& w, const Value& y, size_t M, size_t N){
+  PPU_TRACE_OP(ctx, x, w, y);
+  return arrayToValue(compute(ctx)->LogRegAll(getArray(x),getArray(y), M , N), w.shape());
+}
+
 // TODO: this should not be here, the function will not be dispatched to mpc
 // layer.
 Value _permute_p(HalContext* ctx, const Value& x, size_t dimension,

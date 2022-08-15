@@ -26,7 +26,8 @@ import ppu.binding as pyppu
 @parameterized.product(wsize=(2, 3, 5),
                        prot=(pyppu.ProtocolKind.REF2K,
                              pyppu.ProtocolKind.SEMI2K,
-                             pyppu.ProtocolKind.ABY3),
+                             pyppu.ProtocolKind.ABY3,
+                             pyppu.ProtocolKind.FSS),
                        field=(pyppu.FieldType.FM32, pyppu.FieldType.FM64,
                               pyppu.FieldType.FM128))
 class UnitTests(parameterized.TestCase):

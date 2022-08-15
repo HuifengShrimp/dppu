@@ -108,6 +108,13 @@ Value matmul(HalContext* ctx, const Value& x, const Value& y) {
   return DtypeBinaryDispatch<f_matmul, i_matmul, int2fxp>("matmul", ctx, x, y);
 }
 
+Value logreg(HalContext* ctx, const Value& x, const Value& w, const Value& y, size_t M, size_t N){
+  PPU_TRACE_OP(ctx, x, w, y);
+
+  //lj-todo
+  return _logreg(ctx, x, w, y, M, N).as_fxp();
+}
+
 Value logical_not(HalContext* ctx, const Value& x) {
   PPU_TRACE_OP(ctx, x);
 
@@ -221,6 +228,10 @@ Value logistic(HalContext* ctx, const Value& in) {
   PPU_TRACE_OP(ctx, in);
 
   PPU_ENFORCE(in.is_fxp());
+
+  // std::cout<<"*************************"<<std::endl;
+  // std::cout<<ctx->rt_config().sigmoid_mode()<<std::endl;
+  // std::cout<<"*************************"<<std::endl;
 
   switch (ctx->rt_config().sigmoid_mode()) {
     case ppu::SigmoidMode::DEFAULT:
@@ -374,5 +385,7 @@ Value permute(HalContext* ctx, const Value& x, size_t dimension,
 
   return _permute(ctx, x, dimension, permutations);
 }
+
+
 
 }  // namespace ppu::hal

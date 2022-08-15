@@ -161,6 +161,21 @@ class MatMulAA : public MatmulKernel {
                 int64_t M, int64_t N, int64_t K) const override;
 };
 
+class LogReg : public LogRegKernel{
+  public:
+  static constexpr char kName[] = "LogReg";
+
+  util::CExpr latency() const override { return Const(1); }
+
+  util::CExpr comm() const override {
+    // TODO(jint) express M, N, K
+    return nullptr;
+  }
+
+  ArrayRef proc(KernelEvalContext* ctx, const ArrayRef& A, const ArrayRef& B, const ArrayRef& C,
+                int64_t M, int64_t N) const override;
+};
+
 class TruncPrA : public UnaryWithBitsKernel {
  public:
   static constexpr char kName[] = "TruncPrA";

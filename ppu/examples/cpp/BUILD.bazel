@@ -34,6 +34,22 @@ ppu_cc_binary(
     ],
 )
 
+ppu_cc_binary(
+    name = "fss_lr",
+    srcs = ["fss_lr.cc"],
+    data = [
+        "//examples/cpp/data",
+    ],
+    deps = [
+        ":utils",
+        "//ppu/device:colocated_io",
+        "//ppu/link:factory",
+        "//ppu/numpy",
+        "@com_google_absl//absl/strings",
+        "@llvm-project//llvm:Support",
+    ],
+)
+
 ppu_cc_library(
     name = "utils",
     srcs = ["utils.cc"],

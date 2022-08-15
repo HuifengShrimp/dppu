@@ -33,20 +33,38 @@ def add_constant_col(data):
 
 
 def load_full_dataset():
-    from sklearn.datasets import load_breast_cancer
-    ds = load_breast_cancer()
-    x, y = ds['data'], ds['target']
-    x = normalize(x)
-    y = y.astype(dtype=np.float64)
+    # from sklearn.datasets import load_breast_cancer
+    # ds = load_breast_cancer()
+    import pandas as pd
+    from sklearn import preprocessing
+
+    df1 = pd.read_csv('/home/admin/dev/examples/cpp/data/perfect_logit_a.csv')
+    df2 = pd.read_csv('/home/admin/dev/examples/cpp/data/perfect_logit_b.csv')
+
+
+    y = pd.DataFrame(df1['y']).to_numpy()
+
+    df11 = pd.DataFrame(df1.iloc[:,:10])
+
+    data = df11.join(df2,how='left')
+
+    scaler = preprocessing.MinMaxScaler()
+    x = scaler.fit_transform(data)
+
+    # x, y = data, target
+    # x = normalize(x)
+    # y = y.astype(dtype=np.float64)
+
+
     return x, y
 
 
 def load_feature(rank: int):
     x, _ = load_full_dataset()
     if rank == 0:
-        return x[:, :15]
+        return x[:, :10]
     elif rank == 1:
-        return x[:, 15:]
+        return x[:, 10:]
     else:
         raise Exception(f'only two party supported, got={rank}')
 

@@ -54,4 +54,17 @@ ArrayRef BeaverRef::RandBit(FieldType field, size_t size) {
   return ring_zeros(field, size);
 }
 
+Beaver::LR_set BeaverRef::lr(Field field, size_t M, size_t N){
+  return {
+    ring_zeros(field, M * N),
+    ring_zeros(field, 1 * N),
+    ring_zeros(field, M * 1),
+    ring_zeros(field, 1 * M),
+    ring_zeros(field, M * N * N),
+    ring_zeros(field, 1 * N),
+    ring_zeros(field, 1 * N),
+    ring_zeros(field, N * N),
+  };
+}
+
 }  // namespace ppu::mpc
