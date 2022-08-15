@@ -19,8 +19,8 @@
 // > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/perfect_logit_b.csv --rank=1
 
 // clang-format on
-// > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/breast_cancer_b.csv --rank=1 --has_label=true
-// > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/breast_cancer_a.csv
+// > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/breast_cancer_b.csv --has_label=true
+// > bazel run //examples/cpp:simple_lr -- --dataset=examples/cpp/data/breast_cancer_a.csv --rank=1 
 #include <fstream>
 #include <iostream>
 #include <vector>

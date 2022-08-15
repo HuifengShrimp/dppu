@@ -113,9 +113,9 @@ class MatMulSS : public MatmulKernel {
                 int64_t M, int64_t N, int64_t K) const override;
 };
 
-class LogRegAll : public LogRegKernel {
+class LogReg : public LogRegKernel {
  public:
-  static constexpr char kName[] = "LogRegAll";
+  static constexpr char kName[] = "LogReg";
 
   Kind kind() const override { return Kind::kDynamic; }
 

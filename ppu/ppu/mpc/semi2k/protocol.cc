@@ -65,6 +65,7 @@ std::unique_ptr<Object> makeSemi2kProtocol(
   obj->regKernel<MulSS>();
   obj->regKernel<MatMulSP>();
   obj->regKernel<MatMulSS>();
+  // obj->regKernel<LogReg>();
   obj->regKernel<AndSP>();
   obj->regKernel<AndSS>();
   obj->regKernel<XorSP>();
@@ -89,6 +90,7 @@ std::unique_ptr<Object> makeSemi2kProtocol(
   obj->regKernel<semi2k::MulAA>();
   obj->regKernel<semi2k::MatMulAP>();
   obj->regKernel<semi2k::MatMulAA>();
+  obj->regKernel<semi2k::LogReg>();
   obj->regKernel<semi2k::TruncPrA>();
 
   obj->regKernel<semi2k::ZeroB>();

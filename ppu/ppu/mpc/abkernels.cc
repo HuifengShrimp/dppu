@@ -147,12 +147,12 @@ ArrayRef MatMulSS::proc(KernelEvalContext* ctx, const ArrayRef& A,
   return _MatMulAA(A, B, M, N, K);
 }
 
-ArrayRef LogRegAll::proc(KernelEvalContext* ctx, const ArrayRef& A,
-                         const ArrayRef& B, const ArrayRef& C, int64_t M,
-                         int64_t N) const{
-  PPU_TRACE_OP(this, A, B, C);
-  return _LogReg(A, B, C, M, N);
-}
+// ArrayRef LogReg::proc(KernelEvalContext* ctx, const ArrayRef& A,
+//                          const ArrayRef& B, const ArrayRef& C, int64_t M,
+//                          int64_t N) const{
+//   PPU_TRACE_OP(this, A, B, C);
+//   return _LogReg(A, B, C, M, N);
+// }
 
 ArrayRef AndSP::proc(KernelEvalContext* ctx, const ArrayRef& lhs,
                      const ArrayRef& rhs) const {
