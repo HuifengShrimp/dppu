@@ -54,7 +54,9 @@ ppu::hal::Value train_step(ppu::HalContext* ctx, const ppu::hal::Value& x,
   // auto p1 = np::mul(ctx, lr, np::reciprocal(ctx, msize));
   // auto step = np::mul(ctx, p1, grad);
 
-  size_t m = 10000, n = 20;
+  size_t m = x.elsize(), n = 10;
+  // std::cout<<"*********train_step**************"<<std::endl;
+  // std::cout<<"*********************************"<<std::endl;
   SPDLOG_TRACE("[FSS-LR] ");
   auto new_w = np::logreg(ctx, x, w, y, m, n);
 
@@ -75,6 +77,10 @@ ppu::hal::Value train(ppu::HalContext* ctx, const ppu::hal::Value& x,
       const auto rows_beg = iter * bsize;
       const auto rows_end = rows_beg + bsize;
 
+      // std::cout<<"**********bsize**************"<<std::endl;
+      // std::cout<<"*********"<<bsize<<"*********"<<std::endl;
+      // std::cout<<"*****************************"<<std::endl;
+
       const auto x_slice =
           np::slice(ctx, x, {rows_beg, 0},
                     {rows_end, static_cast<size_t>(x.shape()[1])}, {});
@@ -82,6 +88,7 @@ ppu::hal::Value train(ppu::HalContext* ctx, const ppu::hal::Value& x,
       const auto y_slice =
           np::slice(ctx, y, {rows_beg, 0},
                     {rows_end, static_cast<size_t>(y.shape()[1])}, {});
+
 
       w = train_step(ctx, x_slice, y_slice, w);
     }

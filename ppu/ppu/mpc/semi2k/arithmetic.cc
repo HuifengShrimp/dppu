@@ -251,24 +251,56 @@ ArrayRef LogReg::proc(KernelEvalContext* ctx, const ArrayRef& x,
   std::cout<<"******************logreg start***************************"<<std::endl;
   PPU_TRACE_OP(this, x, y, w);
 
+  std::cout<<"*****************x.shape****************************"<<std::endl;
+  std::cout<<x.elsize()<<std::endl;
+
+  std::cout<<"*****************M****************************"<<std::endl;
+  std::cout<<M<<std::endl;
+
+
   const auto field = x.eltype().as<Ring2k>()->field();
   auto* comm = ctx->caller()->getState<Communicator>();
+
+  std::cout<<"************************BEAVER*********************"<<std::endl;
 
   //This beaver refers the trusted dealer, not using beaver triples.
   auto* beaver = ctx->caller()->getState<Semi2kState>()->beaver();
 
+  std::cout<<"************************BEAVER is ready*********************"<<std::endl;
+
+
   //generate dealer correlated randomness.
   auto [r1, r2, r3, c1, c2, c3, c4, c5] = beaver->lr(field, M, N);
 
+  std::cout<<"************************CR*********************"<<std::endl;
+
+  std::cout<<"x.shape"<<x.elsize()<<std::endl;
+
+  std::cout<<"r1.shape"<<r1.elsize()<<std::endl;
+
+  std::cout<<"w.shape"<<w.elsize()<<std::endl;
+
+  std::cout<<"r2.shape"<<r2.elsize()<<std::endl;
+
+  std::cout<<"y.shape"<<y.elsize()<<std::endl;
+
+  std::cout<<"r3.shape"<<r3.elsize()<<std::endl;
+
   //Open x-r1, w-r2, y-r3
+
   auto res =
       vectorize({ring_sub(x, r1), ring_sub(w, r2), ring_sub(y, r3)}, [&](const ArrayRef& s){
         return comm->allReduce(ReduceOp::ADD, s, kName);
       });
+
+  // std::cout<<"vectorize"<<std::endl;
+
   
   auto x_r1 = std::move(res[0]);
   auto w_r2 = std::move(res[1]);
   auto y_r3 = std::move(res[2]);
+
+  std::cout<<"************************REVEAL*********************"<<std::endl;
 
   //Transpose : x_r1^T
   size_t i = 0, index;
@@ -278,6 +310,8 @@ ArrayRef LogReg::proc(KernelEvalContext* ctx, const ArrayRef& x,
     x_r1T.at<int32_t>(index) = x_r1.at<int32_t>(i);
     std::cout<<x_r1.at<int32_t>(i)<<std::endl;
   }
+
+  std::cout<<"************************TRANSPOSE*********************"<<std::endl;
 
   //Transpose : r1^T
   ArrayRef r1T(makeType<RingTy>(field), N * M);
@@ -291,6 +325,7 @@ ArrayRef LogReg::proc(KernelEvalContext* ctx, const ArrayRef& x,
 
   ArrayRef iden2(makeType<RingTy>(field), M) ;
   std::memset(iden2.data(), 2, iden2.buf()->size());
+  
   
   //Delta
   auto w1 = ring_sub(ring_sub(ring_sub(ring_sub(
@@ -308,6 +343,8 @@ ArrayRef LogReg::proc(KernelEvalContext* ctx, const ArrayRef& x,
   ring_mmul(y_r3, r1, 1, N, M)),
   ring_mmul(r3, x_r1, 1, N, M)),
   c4);
+
+  std::cout<<"************************DELTA*********************"<<std::endl;
 
   auto w2 = ring_sub(ring_sub(ring_sub(ring_sub(
     ring_add(x_r1, r1),

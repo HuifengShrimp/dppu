@@ -1,0 +1,260 @@
+220816 05:00:54.134:I 1 [com.google.devtools.build.lib.analysis.BlazeVersionInfo.logVersionInfo] Bazel version info: Build label: 4.2.1
+Build target: bazel-out/k8-opt/bin/src/main/java/com/google/devtools/build/lib/bazel/BazelServer_deploy.jar
+Build time: Mon Aug 30 00:00:00 2021 (1630281600)
+Build timestamp: 1630281600
+Build timestamp as int: 1630281600
+220816 05:00:54.249:WT 1 [com.google.devtools.build.lib.jni.JniLoader.<clinit>] Failed to load JNI library
+java.nio.file.FileSystemException: /tmp/bazel-jni.17267014892962485422: No space left on device
+	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:100)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:116)
+	at java.base/sun.nio.fs.UnixFileSystemProvider.createDirectory(UnixFileSystemProvider.java:389)
+	at java.base/java.nio.file.Files.createDirectory(Files.java:690)
+	at java.base/java.nio.file.TempFileHelper.create(TempFileHelper.java:135)
+	at java.base/java.nio.file.TempFileHelper.createTempDirectory(TempFileHelper.java:172)
+	at java.base/java.nio.file.Files.createTempDirectory(Files.java:1007)
+	at com.google.devtools.build.lib.jni.JniLoader.loadLibrary(JniLoader.java:91)
+	at com.google.devtools.build.lib.jni.JniLoader.<clinit>(JniLoader.java:44)
+	at com.google.devtools.build.lib.runtime.BlazeRuntime.maybeForceJNIByGettingPid(BlazeRuntime.java:1308)
+	at com.google.devtools.build.lib.runtime.BlazeRuntime.maybeGetPidString(BlazeRuntime.java:1301)
+	at com.google.devtools.build.lib.runtime.BlazeRuntime.main(BlazeRuntime.java:765)
+	at com.google.devtools.build.lib.bazel.Bazel.main(Bazel.java:85)
+220816 05:00:54.241:I 1 [com.google.devtools.build.lib.runtime.BlazeRuntime.main] Starting Bazel server with , args [--max_idle_secs=10800, --noshutdown_on_low_sys_mem, --connect_timeout_secs=30, --output_user_root=/root/.cache/bazel/_bazel_root, --install_base=/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d, --install_md5=cb3061fba4873dac794e7da85033eb4d, --output_base=/home/root, --workspace_directory=/home/admin/dev, --default_system_javabase=/usr/lib/jvm/java-11-openjdk-11.0.13.0.8-4.el8_5.x86_64, --failure_detail_out=/home/root/failure_detail.rawproto, --expand_configs_in_place, --idle_server_tasks, --write_command_log, --nowatchfs, --nofatal_event_bus_exceptions, --nowindows_enable_symlinks, --client_debug=false, --product_name=Bazel, --noincompatible_enable_execution_transition, --option_sources=output_Ubase:]
+220816 05:00:55.196:I 29 [com.google.devtools.build.lib.server.CommandManager.create] Starting command a3990c4d-5278-4109-9047-00626551d342 on thread grpc-nio-worker-ELG-3-1
+220816 05:00:55.200:I 29 [com.google.devtools.build.lib.server.CommandManager$RunningCommand.close] Finished command a3990c4d-5278-4109-9047-00626551d342 on thread grpc-nio-worker-ELG-3-1
+220816 05:00:55.212:I 31 [com.google.devtools.build.lib.server.CommandManager.create] Starting command 99a2d290-69e2-4eb2-975e-68ab12bd9d93 on thread grpc-command-0
+220816 05:00:55.223:I 31 [com.google.devtools.build.lib.server.GrpcServerImpl.executeCommand] [build, --startup_time=1271, --command_wait_time=0, --extract_data_time=0, --restart_reason=no_daemon, --binary_path=/usr/bin/bazel, --rc_source=client, --default_override=0:common=--isatty=1, --default_override=0:common=--terminal_columns=173, --rc_source=/home/admin/dev/.bazelrc, --default_override=1:test:ubsan=--strip=never, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-fno-sanitize-recover=all, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-fsanitize=undefined, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-O0, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-g, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-fno-omit-frame-pointer, --default_override=1:test:ubsan=--linkopt, --default_override=1:test:ubsan=-fsanitize=undefined, --default_override=1:common=--experimental_repo_remote_exec, --default_override=1:test=--keep_going, --default_override=1:test=--test_output=errors, --default_override=1:test=--test_timeout=180, --default_override=1:build=--incompatible_new_actions_api=false, --default_override=1:build=--copt=-fdiagnostics-color=always, --default_override=1:build=--enable_platform_specific_config, --default_override=1:build=--cxxopt=-std=c++17, --default_override=1:build=--host_cxxopt=-std=c++17, --default_override=1:build:macos=--features=-supports_dynamic_linker, --default_override=1:build:macos=--cxxopt, --default_override=1:build:macos=-Wno-deprecated-enum-enum-conversion, --default_override=1:build:macos=--cxxopt, --default_override=1:build:macos=-Wno-deprecated-anon-enum-enum-conversion, --default_override=1:test:asan=--strip=never, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-fno-sanitize-recover=all, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-fsanitize=address, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-O0, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-g, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-fno-omit-frame-pointer, --default_override=1:test:asan=--linkopt, --default_override=1:test:asan=-fsanitize=address, --default_override=1:build:ubsan=--strip=never, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-fno-sanitize-recover=all, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-fsanitize=undefined, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-Og, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-g, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-fno-omit-frame-pointer, --default_override=1:build:ubsan=--linkopt, --default_override=1:build:ubsan=-fsanitize=undefined, --default_override=1:build:asan=--strip=never, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-fno-sanitize-recover=all, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-fsanitize=address, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-Og, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-g, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-fno-omit-frame-pointer, --default_override=1:build:asan=--linkopt, --default_override=1:build:asan=-fsanitize=address, --client_env=LD_LIBRARY_PATH=/opt/rh/gcc-toolset-11/root/usr/lib64:/opt/rh/gcc-toolset-11/root/usr/lib:/opt/rh/gcc-toolset-11/root/usr/lib64/dyninst:/opt/rh/gcc-toolset-11/root/usr/lib/dyninst, --client_env=MODULES_RUN_QUARANTINE=LD_LIBRARY_PATH LD_PRELOAD, --client_env=LANG=en_US.UTF-8, --client_env=HOSTNAME=6886d7acd6b3, --client_env=OLDPWD=/home/admin, --client_env=PCP_DIR=/opt/rh/gcc-toolset-11/root, --client_env=which_declare=declare -f, --client_env=MODULES_CMD=/usr/share/Modules/libexec/modulecmd.tcl, --client_env=PWD=/home/admin/dev, --client_env=HOME=/root, --client_env=LOADEDMODULES=, --client_env=TERM=xterm, --client_env=X_SCLS=gcc-toolset-11 , --client_env=SHLVL=1, --client_env=PYTHONPATH=:/home/admin/dev/examples:/home/admin/dev, --client_env=MANPATH=/opt/rh/gcc-toolset-11/root/usr/share/man:, --client_env=MODULEPATH=/etc/scl/modulefiles:/usr/share/Modules/modulefiles:/etc/modulefiles:/usr/share/modulefiles, --client_env=MODULEPATH_modshare=/usr/share/modulefiles:1:/usr/share/Modules/modulefiles:1:/etc/modulefiles:1, --client_env=PATH=/usr/share/Modules/bin:/opt/rh/gcc-toolset-11/root/usr/bin:/opt/rh/gcc-toolset-11/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin, --client_env=MODULESHOME=/usr/share/Modules, --client_env=PKG_CONFIG_PATH=/opt/rh/gcc-toolset-11/root/usr/lib64/pkgconfig, --client_env=INFOPATH=/opt/rh/gcc-toolset-11/root/usr/share/info, --client_env=LESSOPEN=||/usr/bin/lesspipe.sh %s, --client_env=BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot "$@"
+}, --client_env=BASH_FUNC_module%%=() {  _module_raw "$@" 2>&1
+}, --client_env=BASH_FUNC__module_raw%%=() {  unset _mlshdbg;
+ if [ "${MODULES_SILENT_SHELL_DEBUG:-0}" = '1' ]; then
+ case "$-" in 
+ *v*x*)
+ set +vx;
+ _mlshdbg='vx'
+ ;;
+ *v*)
+ set +v;
+ _mlshdbg='v'
+ ;;
+ *x*)
+ set +x;
+ _mlshdbg='x'
+ ;;
+ *)
+ _mlshdbg=''
+ ;;
+ esac;
+ fi;
+ unset _mlre _mlIFS;
+ if [ -n "${IFS+x}" ]; then
+ _mlIFS=$IFS;
+ fi;
+ IFS=' ';
+ for _mlv in ${MODULES_RUN_QUARANTINE:-};
+ do
+ if [ "${_mlv}" = "${_mlv##*[!A-Za-z0-9_]}" -a "${_mlv}" = "${_mlv#[0-9]}" ]; then
+ if [ -n "`eval 'echo ${'$_mlv'+x}'`" ]; then
+ _mlre="${_mlre:-}${_mlv}_modquar='`eval 'echo ${'$_mlv'}'`' ";
+ fi;
+ _mlrv="MODULES_RUNENV_${_mlv}";
+ _mlre="${_mlre:-}${_mlv}='`eval 'echo ${'$_mlrv':-}'`' ";
+ fi;
+ done;
+ if [ -n "${_mlre:-}" ]; then
+ eval `eval ${_mlre} /usr/bin/tclsh /usr/share/Modules/libexec/modulecmd.tcl bash '"$@"'`;
+ else
+ eval `/usr/bin/tclsh /usr/share/Modules/libexec/modulecmd.tcl bash "$@"`;
+ fi;
+ _mlstatus=$?;
+ if [ -n "${_mlIFS+x}" ]; then
+ IFS=$_mlIFS;
+ else
+ unset IFS;
+ fi;
+ unset _mlre _mlv _mlrv _mlIFS;
+ if [ -n "${_mlshdbg:-}" ]; then
+ set -$_mlshdbg;
+ fi;
+ unset _mlshdbg;
+ return $_mlstatus
+}, --client_env=BASH_FUNC_switchml%%=() {  typeset swfound=1;
+ if [ "${MODULES_USE_COMPAT_VERSION:-0}" = '1' ]; then
+ typeset swname='main';
+ if [ -e /usr/share/Modules/libexec/modulecmd.tcl ]; then
+ typeset swfound=0;
+ unset MODULES_USE_COMPAT_VERSION;
+ fi;
+ else
+ typeset swname='compatibility';
+ if [ -e /usr/share/Modules/libexec/modulecmd-compat ]; then
+ typeset swfound=0;
+ MODULES_USE_COMPAT_VERSION=1;
+ export MODULES_USE_COMPAT_VERSION;
+ fi;
+ fi;
+ if [ $swfound -eq 0 ]; then
+ echo "Switching to Modules $swname version";
+ source /usr/share/Modules/init/bash;
+ else
+ echo "Cannot switch to Modules $swname version, command not found";
+ return 1;
+ fi
+}, --client_env=BASH_FUNC_scl%%=() {  if [ "$1" = "load" -o "$1" = "unload" ]; then
+ eval "module $@";
+ else
+ /usr/bin/scl "$@";
+ fi
+}, --client_env=BASH_FUNC_ml%%=() {  module ml "$@"
+}, --client_cwd=/home/admin/dev, ...]
+220816 05:00:55.301:I 31 [com.google.devtools.build.lib.actions.LocalHostCapacity.getNewLocalHostCapacity] Determined local resources: RAM=257172MB, CPU=40.0
+220816 05:00:55.497:I 31 [com.google.devtools.build.lib.metrics.PostGCMemoryUseRecorder.<init>] Listening for notifications from GC: G1 Young Generation
+220816 05:00:55.498:I 31 [com.google.devtools.build.lib.metrics.PostGCMemoryUseRecorder.<init>] Listening for notifications from GC: G1 Old Generation
+220816 05:00:55.508:I 31 [com.google.devtools.build.lib.util.DebugLoggerConfigurator.setupLogging] Log level: INFO
+220816 05:00:55.651:I 31 [com.google.devtools.build.lib.skyframe.DiffAwarenessManager.maybeGetDiffAwarenessState] Using local DiffAwareness strategy for /home/admin/dev
+220816 05:00:55.652:I 31 [com.google.devtools.build.lib.skyframe.DiffAwarenessManager.getDiff] Initial baseline view for /home/admin/dev is SequentialView[owner=null, position=-2, modifiedAbsolutePaths=[]]
+220816 05:00:55.656:I 31 [com.google.devtools.build.lib.skyframe.SequencedSkyframeExecutor.handleDiffsWithMissingDiffInformation] About to scan skyframe graph checking for filesystem nodes of types [EXTERNAL, OUTPUT, EXTERNAL_REPO, EXTERNAL_IN_MANAGED_DIRECTORY]
+220816 05:00:55.664:I 31 [com.google.devtools.build.lib.skyframe.FilesystemValueChecker.lambda$getDirtyValues$2] Spent 4324741 nanoseconds checking 2 filesystem nodes (20 scanned)
+220816 05:00:55.665:I 31 [com.google.devtools.build.lib.skyframe.SequencedSkyframeExecutor.logDiffInfo] DiffAwareness found 0 modified source files and directory listings for /home/admin/dev
+220816 05:00:55.741:I 31 [com.google.devtools.build.lib.buildtool.BuildTool.buildTargets] Build identifier: 8d3c3c79-3894-40eb-8a48-db05b1c825ca
+220816 05:00:55.873:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/]
+220816 05:00:55.874:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root]
+220816 05:00:55.875:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache]
+220816 05:00:55.876:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel]
+220816 05:00:55.877:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root]
+220816 05:00:55.877:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install]
+220816 05:00:55.878:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d]
+220816 05:00:55.879:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools]
+220816 05:00:55.882:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/WORKSPACE.bazel]
+220816 05:00:55.883:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/WORKSPACE]
+220816 05:00:55.887:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/.bazelignore]
+220816 05:00:55.889:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools]
+220816 05:00:55.889:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools/build_defs]
+220816 05:00:55.890:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools/build_defs/repo]
+220816 05:00:55.891:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools/build_defs/repo/BUILD.bazel]
+220816 05:00:55.892:I 120 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools/build_defs/repo/BUILD]
+220816 05:00:55.894:I 126 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools/build_defs/repo/git.bzl]
+220816 05:00:55.895:I 155 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools/build_defs/repo/http.bzl]
+220816 05:00:55.895:I 124 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools/build_defs/repo/utils.bzl]
+220816 05:00:55.911:I 133 [com.google.devtools.build.lib.skyframe.ExternalFilesHelper.maybeHandleExternalFile] Encountered an external path [<absolute root>]/[/root/.cache/bazel/_bazel_root/install/cb3061fba4873dac794e7da85033eb4d/embedded_tools/tools/build_defs/repo/git_worker.bzl]
+220816 05:05:49.964:I 29 [com.google.devtools.build.lib.server.GrpcServerImpl.cancel] Got CancelRequest for command id 99a2d290-69e2-4eb2-975e-68ab12bd9d93
+220816 05:05:49.966:I 159 [com.google.devtools.build.lib.server.CommandManager.create] Starting command 11e6f451-4720-4642-b1cc-cc4e1aa762db on thread grpc-command-1
+220816 05:05:49.967:I 159 [com.google.devtools.build.lib.server.CommandManager.doCancel] Interrupting command 99a2d290-69e2-4eb2-975e-68ab12bd9d93 on thread grpc-command-0
+220816 05:05:49.968:I 159 [com.google.devtools.build.lib.server.CommandManager$RunningCommand.close] Finished command 11e6f451-4720-4642-b1cc-cc4e1aa762db on thread grpc-command-1
+220816 05:05:50.082:I 31 [com.google.devtools.build.lib.runtime.BlazeCommandDispatcher.exec] Exit status was DetailedExitCode{exitCode=INTERRUPTED, failureDetail=message: "build interrupted"
+interrupted {
+  code: INTERRUPTED
+}
+}
+220816 05:05:50.086:I 31 [com.google.devtools.build.lib.server.CommandManager$RunningCommand.close] Finished command 99a2d290-69e2-4eb2-975e-68ab12bd9d93 on thread grpc-command-0
+220816 05:06:00.169:I 161 [com.google.devtools.build.lib.server.IdleServerTasks.lambda$idle$0] Spent 78 milliseconds doing Idle GC
+220816 05:06:00.170:I 161 [com.google.devtools.build.lib.server.IdleServerTasks.lambda$idle$0] [Idle GC] used: 23MB -> 22MB, committed: 2155MB -> 125MB
+220816 05:06:00.172:I 5 [com.google.devtools.build.lib.metrics.PostGCMemoryUseRecorder.doHandleNotification] Memory use after full GC: 76144792
+220816 05:08:01.542:I 162 [com.google.devtools.build.lib.server.CommandManager.create] Starting command 2e26746d-dd6b-4b85-836c-215793b0c8d4 on thread grpc-nio-worker-ELG-3-2
+220816 05:08:01.544:I 162 [com.google.devtools.build.lib.server.CommandManager$RunningCommand.close] Finished command 2e26746d-dd6b-4b85-836c-215793b0c8d4 on thread grpc-nio-worker-ELG-3-2
+220816 05:08:01.550:I 164 [com.google.devtools.build.lib.server.CommandManager.create] Starting command 4075c1e6-12bf-40c1-acf1-8481204d162f on thread grpc-command-2
+220816 05:08:01.555:I 164 [com.google.devtools.build.lib.server.GrpcServerImpl.executeCommand] [build, --startup_time=25, --command_wait_time=0, --extract_data_time=0, --binary_path=/usr/bin/bazel, --rc_source=client, --default_override=0:common=--isatty=1, --default_override=0:common=--terminal_columns=173, --rc_source=/home/admin/dev/.bazelrc, --default_override=1:test:ubsan=--strip=never, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-fno-sanitize-recover=all, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-fsanitize=undefined, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-O0, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-g, --default_override=1:test:ubsan=--copt, --default_override=1:test:ubsan=-fno-omit-frame-pointer, --default_override=1:test:ubsan=--linkopt, --default_override=1:test:ubsan=-fsanitize=undefined, --default_override=1:common=--experimental_repo_remote_exec, --default_override=1:test=--keep_going, --default_override=1:test=--test_output=errors, --default_override=1:test=--test_timeout=180, --default_override=1:build=--incompatible_new_actions_api=false, --default_override=1:build=--copt=-fdiagnostics-color=always, --default_override=1:build=--enable_platform_specific_config, --default_override=1:build=--cxxopt=-std=c++17, --default_override=1:build=--host_cxxopt=-std=c++17, --default_override=1:build:macos=--features=-supports_dynamic_linker, --default_override=1:build:macos=--cxxopt, --default_override=1:build:macos=-Wno-deprecated-enum-enum-conversion, --default_override=1:build:macos=--cxxopt, --default_override=1:build:macos=-Wno-deprecated-anon-enum-enum-conversion, --default_override=1:test:asan=--strip=never, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-fno-sanitize-recover=all, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-fsanitize=address, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-O0, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-g, --default_override=1:test:asan=--copt, --default_override=1:test:asan=-fno-omit-frame-pointer, --default_override=1:test:asan=--linkopt, --default_override=1:test:asan=-fsanitize=address, --default_override=1:build:ubsan=--strip=never, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-fno-sanitize-recover=all, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-fsanitize=undefined, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-Og, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-g, --default_override=1:build:ubsan=--copt, --default_override=1:build:ubsan=-fno-omit-frame-pointer, --default_override=1:build:ubsan=--linkopt, --default_override=1:build:ubsan=-fsanitize=undefined, --default_override=1:build:asan=--strip=never, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-fno-sanitize-recover=all, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-fsanitize=address, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-Og, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-g, --default_override=1:build:asan=--copt, --default_override=1:build:asan=-fno-omit-frame-pointer, --default_override=1:build:asan=--linkopt, --default_override=1:build:asan=-fsanitize=address, --client_env=LD_LIBRARY_PATH=/opt/rh/gcc-toolset-11/root/usr/lib64:/opt/rh/gcc-toolset-11/root/usr/lib:/opt/rh/gcc-toolset-11/root/usr/lib64/dyninst:/opt/rh/gcc-toolset-11/root/usr/lib/dyninst, --client_env=MODULES_RUN_QUARANTINE=LD_LIBRARY_PATH LD_PRELOAD, --client_env=LANG=en_US.UTF-8, --client_env=HOSTNAME=6886d7acd6b3, --client_env=OLDPWD=/home/admin, --client_env=PCP_DIR=/opt/rh/gcc-toolset-11/root, --client_env=which_declare=declare -f, --client_env=MODULES_CMD=/usr/share/Modules/libexec/modulecmd.tcl, --client_env=PWD=/home/admin/dev, --client_env=HOME=/root, --client_env=LOADEDMODULES=, --client_env=TERM=xterm, --client_env=X_SCLS=gcc-toolset-11 , --client_env=SHLVL=1, --client_env=PYTHONPATH=:/home/admin/dev/examples:/home/admin/dev, --client_env=MANPATH=/opt/rh/gcc-toolset-11/root/usr/share/man:, --client_env=MODULEPATH=/etc/scl/modulefiles:/usr/share/Modules/modulefiles:/etc/modulefiles:/usr/share/modulefiles, --client_env=MODULEPATH_modshare=/usr/share/modulefiles:1:/usr/share/Modules/modulefiles:1:/etc/modulefiles:1, --client_env=PATH=/usr/share/Modules/bin:/opt/rh/gcc-toolset-11/root/usr/bin:/opt/rh/gcc-toolset-11/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin, --client_env=MODULESHOME=/usr/share/Modules, --client_env=PKG_CONFIG_PATH=/opt/rh/gcc-toolset-11/root/usr/lib64/pkgconfig, --client_env=INFOPATH=/opt/rh/gcc-toolset-11/root/usr/share/info, --client_env=LESSOPEN=||/usr/bin/lesspipe.sh %s, --client_env=BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot "$@"
+}, --client_env=BASH_FUNC_module%%=() {  _module_raw "$@" 2>&1
+}, --client_env=BASH_FUNC__module_raw%%=() {  unset _mlshdbg;
+ if [ "${MODULES_SILENT_SHELL_DEBUG:-0}" = '1' ]; then
+ case "$-" in 
+ *v*x*)
+ set +vx;
+ _mlshdbg='vx'
+ ;;
+ *v*)
+ set +v;
+ _mlshdbg='v'
+ ;;
+ *x*)
+ set +x;
+ _mlshdbg='x'
+ ;;
+ *)
+ _mlshdbg=''
+ ;;
+ esac;
+ fi;
+ unset _mlre _mlIFS;
+ if [ -n "${IFS+x}" ]; then
+ _mlIFS=$IFS;
+ fi;
+ IFS=' ';
+ for _mlv in ${MODULES_RUN_QUARANTINE:-};
+ do
+ if [ "${_mlv}" = "${_mlv##*[!A-Za-z0-9_]}" -a "${_mlv}" = "${_mlv#[0-9]}" ]; then
+ if [ -n "`eval 'echo ${'$_mlv'+x}'`" ]; then
+ _mlre="${_mlre:-}${_mlv}_modquar='`eval 'echo ${'$_mlv'}'`' ";
+ fi;
+ _mlrv="MODULES_RUNENV_${_mlv}";
+ _mlre="${_mlre:-}${_mlv}='`eval 'echo ${'$_mlrv':-}'`' ";
+ fi;
+ done;
+ if [ -n "${_mlre:-}" ]; then
+ eval `eval ${_mlre} /usr/bin/tclsh /usr/share/Modules/libexec/modulecmd.tcl bash '"$@"'`;
+ else
+ eval `/usr/bin/tclsh /usr/share/Modules/libexec/modulecmd.tcl bash "$@"`;
+ fi;
+ _mlstatus=$?;
+ if [ -n "${_mlIFS+x}" ]; then
+ IFS=$_mlIFS;
+ else
+ unset IFS;
+ fi;
+ unset _mlre _mlv _mlrv _mlIFS;
+ if [ -n "${_mlshdbg:-}" ]; then
+ set -$_mlshdbg;
+ fi;
+ unset _mlshdbg;
+ return $_mlstatus
+}, --client_env=BASH_FUNC_switchml%%=() {  typeset swfound=1;
+ if [ "${MODULES_USE_COMPAT_VERSION:-0}" = '1' ]; then
+ typeset swname='main';
+ if [ -e /usr/share/Modules/libexec/modulecmd.tcl ]; then
+ typeset swfound=0;
+ unset MODULES_USE_COMPAT_VERSION;
+ fi;
+ else
+ typeset swname='compatibility';
+ if [ -e /usr/share/Modules/libexec/modulecmd-compat ]; then
+ typeset swfound=0;
+ MODULES_USE_COMPAT_VERSION=1;
+ export MODULES_USE_COMPAT_VERSION;
+ fi;
+ fi;
+ if [ $swfound -eq 0 ]; then
+ echo "Switching to Modules $swname version";
+ source /usr/share/Modules/init/bash;
+ else
+ echo "Cannot switch to Modules $swname version, command not found";
+ return 1;
+ fi
+}, --client_env=BASH_FUNC_scl%%=() {  if [ "$1" = "load" -o "$1" = "unload" ]; then
+ eval "module $@";
+ else
+ /usr/bin/scl "$@";
+ fi
+}, --client_env=BASH_FUNC_ml%%=() {  module ml "$@"
+}, --client_cwd=/home/admin/dev, ...]
+220816 05:08:01.591:I 164 [com.google.devtools.build.lib.skyframe.DiffAwarenessManager.getDiff] About to compute diff between SequentialView[owner=null, position=-2, modifiedAbsolutePaths=[]] and SequentialView[owner=null, position=-2, modifiedAbsolutePaths=[]] for /home/admin/dev
+220816 05:08:01.592:I 164 [com.google.devtools.build.lib.skyframe.SequencedSkyframeExecutor.handleDiffsWithMissingDiffInformation] About to scan skyframe graph checking for filesystem nodes of types [EXTERNAL, OUTPUT, EXTERNAL_REPO, EXTERNAL_IN_MANAGED_DIRECTORY]
+220816 05:08:01.603:I 164 [com.google.devtools.build.lib.skyframe.FilesystemValueChecker.lambda$getDirtyValues$2] Spent 9772015 nanoseconds checking 31 filesystem nodes (122 scanned)
+220816 05:08:01.603:I 164 [com.google.devtools.build.lib.skyframe.SequencedSkyframeExecutor.logDiffInfo] DiffAwareness found 0 modified source files and directory listings for /home/admin/dev
+220816 05:08:01.605:I 164 [com.google.devtools.build.lib.buildtool.BuildTool.buildTargets] Build identifier: 00e9f044-3e09-409c-81cc-d056f01d2ba3
+220816 05:13:37.362:WT 232 [com.google.devtools.build.skyframe.AbstractParallelEvaluator$Evaluate.run] Aborting evaluation while evaluating REPOSITORY_DIRECTORY:@aio
+com.google.devtools.build.lib.rules.repository.RepositoryFunction$RepositoryFunctionException: com.google.devtools.build.lib.rules.repository.RepositoryFunction$AlreadyReportedRepositoryAccessException: error running 'git fetch origin refs/heads/*:refs/remotes/origin/* refs/tags/*:refs/tags/*' while working with @aio:
+fatal: unable to access 'https://github.com/secretflow/aio.git/': Empty reply from server
+
+	at com.google.devtools.build.lib.rules.repository.RepositoryDelegatorFunction.fetchRepository(RepositoryDelegatorFunction.java:359)
+	at com.google.devtools.build.lib.rules.repository.RepositoryDelegatorFunction.compute(RepositoryDelegatorFunction.java:276)
+	at com.google.devtools.build.skyframe.AbstractParallelEvaluator$Evaluate.run(AbstractParallelEvaluator.java:477)
+	at com.google.devtools.build.lib.concurrent.AbstractQueueVisitor$WrappedRunnable.run(AbstractQueueVisitor.java:398)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+Caused by: com.google.devtools.build.lib.rules.repository.RepositoryFunction$AlreadyReportedRepositoryAccessException: error running 'git fetch origin refs/heads/*:refs/remotes/origin/* refs/tags/*:refs/tags/*' while working with @aio:
+fatal: unable to access 'https://github.com/secretflow/aio.git/': Empty reply from server
+
+	at com.google.devtools.build.lib.rules.repository.RepositoryDelegatorFunction.fetchRepository(RepositoryDelegatorFunction.java:358)
+	... 6 more

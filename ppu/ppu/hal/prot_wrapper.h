@@ -53,7 +53,7 @@ Value _matmul_pp(HalContext* ctx, const Value& x, const Value& y);
 Value _matmul_sp(HalContext* ctx, const Value& x, const Value& y);
 Value _matmul_ss(HalContext* ctx, const Value& x, const Value& y);
 
-Value _logreg_all(HalContext* ctx, const Value& x, const Value& w, const Value& y,size_t M, size_t N);
+Value _logreg(HalContext* ctx, const Value& x, const Value& w, const Value& y,size_t M, size_t N);
 
 Value _and_pp(HalContext* ctx, const Value& x, const Value& y);
 Value _and_sp(HalContext* ctx, const Value& x, const Value& y);

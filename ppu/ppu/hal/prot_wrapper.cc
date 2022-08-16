@@ -246,9 +246,9 @@ Value _matmul_ss(HalContext* ctx, const Value& x, const Value& y) {
                       DeduceDotShape(x.shape(), y.shape()));
 }
 
-Value _logreg_all(HalContext* ctx, const Value& x, const Value& w, const Value& y, size_t M, size_t N){
+Value _logreg(HalContext* ctx, const Value& x, const Value& w, const Value& y, size_t M, size_t N){
   PPU_TRACE_OP(ctx, x, w, y);
-  return arrayToValue(compute(ctx)->LogReg(getArray(x),getArray(y), M , N), w.shape());
+  return arrayToValue(compute(ctx)->LogReg(getArray(x), getArray(w), getArray(y), M , N), w.shape());
 }
 
 // TODO: this should not be here, the function will not be dispatched to mpc

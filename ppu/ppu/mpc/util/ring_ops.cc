@@ -72,25 +72,29 @@ ArrayRef ring_ones(FieldType field, size_t size) {
 }
 
 ArrayRef ring_others(FieldType field, size_t size, int32_t value) {
+  std::cout<<"********ring_others1********"<<std::endl;
   ArrayRef res = ring_zeros(field, size);
   DISPATCH_ALL_FIELDS(field, kName, [&]() {
     auto res_xt = xt_mutable_adapt<ring2k_t>(res);
     res_xt += value;
     return;
   });
+  std::cout<<"********ring_others2********"<<std::endl;
   return res;
 }
 
 ArrayRef assignment(FieldType field, ArrayRef &res, int32_t pos, int32_t value) {
   int32_t cnt = 0;
+  std::cout<<"********************assignment1**************"<<std::endl;
   DISPATCH_ALL_FIELDS(field, kName, [&]() {
     auto res_xt = xt_mutable_adapt<ring2k_t>(res);
-    if( cnt == pos){
-          res_xt = value;
+    if(cnt == pos){
+          res_xt.at(pos)=value;
     }
     cnt++;
     return;
   });
+  std::cout<<"********************assignment2**************"<<std::endl;
   return res;
 }
 

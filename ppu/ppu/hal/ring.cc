@@ -66,11 +66,11 @@ Value _matmul(HalContext* ctx, const Value& x, const Value& y) {
   }
 }
 
-Value _logreg(HalContext* ctx, const Value& x, const Value& w, const Value& y, size_t M, size_t N){
-  //lj-todo
-  return _logreg_all(ctx, x, w, y, M, N);
+// Value _logreg(HalContext* ctx, const Value& x, const Value& w, const Value& y, size_t M, size_t N){
+//   //lj-todo
+//   return _logreg_all(ctx, x, w, y, M, N);
 
-}
+// }
 
 Value _or(HalContext* ctx, const Value& x, const Value& y) {
   // X or Y = X xor Y xor (X and Y)

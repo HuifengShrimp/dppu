@@ -121,21 +121,31 @@ ArrayRef BeaverTfp::RandBit(FieldType field, size_t size) {
 
 Beaver::LR_set BeaverTfp::lr(FieldType field, size_t M, size_t N){
 
-  
-  auto r1 = prgCreateArray(field, M * N, seed_, &counter_, NULL);
-  auto r2 = prgCreateArray(field, 1 * N, seed_, &counter_, NULL);
-  auto c1 = prgCreateArray(field, 1 * M, seed_, &counter_, NULL);
-  
+  std::cout<<"************************lr start*********************"<<std::endl;
 
+  std::vector<PrgArrayDesc> descs(5);
+
+  auto r1 = prgCreateArray(field, M * N, seed_, &counter_, &descs[0]);
+  auto r2 = prgCreateArray(field, 1 * N, seed_, &counter_, &descs[1]);
+  auto c1 = prgCreateArray(field, 1 * M, seed_, &counter_, &descs[2]);
+  
+  std::cout<<"************************lr start1*********************"<<std::endl;
   //r1^T
   size_t i = 0, j = 0, index;
-  ArrayRef r1T(makeType<RingTy>(field),N * M);
+  ArrayRef r1T(makeType<RingTy>(field), N * M);
+
+  std::cout<<"************************lr start11*********************"<<std::endl;
+  
   for ( i = 0 ; i < r1.elsize() ; i++){
     index = (i % N) * M + (i / N);
     r1T.at<int32_t>(index) = r1.at<int32_t>(i);
   }
+
+  std::cout<<"************************lr start12*********************"<<std::endl;
   //c1=r2r1^T(1*N*N*M)
   c1 = ring_mmul(r2,r1T,1,M,N);
+
+  std::cout<<"************************lr start2*********************"<<std::endl;
 
   //c2=r2(x')T r1
   ArrayRef c2(makeType<RingTy>(field), M*N*N) ;
@@ -143,14 +153,15 @@ Beaver::LR_set BeaverTfp::lr(FieldType field, size_t M, size_t N){
     for( j = 0 ; j < N; j++){
       assignment(field, c2, i*N+j, ring_mul(ring_others(field, 1, r2.at<int32_t>(j)),
       ring_others(field, 1, r1T.at<int32_t>(i))).at<int32_t>(0));
+      std::cout<<"************************lr start21*********************"<<std::endl;
     }
   }
 
   //c3 = r2·r1T·r1
-  auto c3 = prgCreateArray(field, 1 * N, seed_, &counter_, NULL);
+  auto c3 = prgCreateArray(field, 1 * N, seed_, &counter_, &descs[3]);
   c3 = ring_mmul(c1,r1,1,N,M);
 
-  auto r3 = prgCreateArray(field, M * 1, seed_, &counter_, NULL);
+  auto r3 = prgCreateArray(field, M * 1, seed_, &counter_, &descs[4]);
 
   //r3^T
   ArrayRef r3T(makeType<RingTy>(field),1*M);
@@ -164,6 +175,8 @@ Beaver::LR_set BeaverTfp::lr(FieldType field, size_t M, size_t N){
 
   //c5 = r1^Tr1
   auto c5 = ring_mmul(r1T,r1,N,N,M);
+
+  std::cout<<"************************lr end*********************"<<std::endl;
 
   return {r1,r2,r3,c1,c2,c3,c4,c5};
 }
